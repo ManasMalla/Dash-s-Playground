@@ -74,6 +74,7 @@ class _DashPlaygroundState extends State<DashPlayground> {
       var androidStudioURls = values
           .where((element) => element["name"] == "android-studio")
           .toList();
+      print("AS: ${androidStudioURls}");
       var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
           .where((element) => element["platform"] == platform)
           .toList();
@@ -82,7 +83,7 @@ class _DashPlaygroundState extends State<DashPlayground> {
       provider.updatePercentage(0.25);
       var openJDKURls =
           values.where((element) => element["name"] == "openJDK").toList();
-      var openJDKURL = (androidStudioURls[0]["urls"] as List<dynamic>)
+      var openJDKURL = (openJDKURls[0]["urls"] as List<dynamic>)
           .where((element) => element["platform"] == platform)
           .toList();
       print("OpenJDK ($platform): ${openJDKURL[0]["url"]}");
