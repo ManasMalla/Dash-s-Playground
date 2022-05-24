@@ -1,16 +1,6 @@
-# dash_playground
+# Dash's Playground
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+###An app for the Cross-Platform
+• Used to either install the softwares and SDK to code using Flutter (on Desktop), or,
+• Allows to code using Flutter on Android and iOS without a laptop
+• with an interactive Preview for viewing your app without deploying
