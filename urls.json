@@ -5,6 +5,27 @@
         "urls": [
           {
             "platform": "macOS",
+            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-x64_bin.tar.gz"
+          },
+          {
+            "platform": "macOS-silicon",
+            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-aarch64_bin.tar.gz"
+          },
+          {
+            "platform": "linux",
+            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_linux-x64_bin.tar.gz"
+          },
+          {
+            "platform": "windows",
+            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_windows-x64_bin.zip"
+          }
+        ]
+      },
+      {
+        "name": "openJDK",
+        "urls": [
+          {
+            "platform": "macOS",
             "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.14/android-studio-2021.2.1.14-mac.zip"
           },
           {
@@ -20,7 +41,6 @@
             "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.14/android-studio-2021.2.1.14-windows.zip"
           }
         ]
-      },
-      {}
+      }
     ]
   }

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:dash_playground/providers/splash_screen_provider.dart';
 import 'package:dash_playground/utils/animated_progress_bar.dart';
@@ -41,11 +43,58 @@ class DashPlayground extends StatefulWidget {
 }
 
 class _DashPlaygroundState extends State<DashPlayground> {
+  Map<String, String> urls = {};
+
+  fetchURLS(context) async {
+    var provider = Provider.of<SplashScreenProvider>(context, listen: false);
+    var jsonUrl =
+        "https://raw.githubusercontent.com/ManasMalla/Dash-s-Playground/main/urls.json";
+    var jsonUri = Uri.tryParse(jsonUrl);
+    if (jsonUri == null) {
+      return;
+    }
+    final response = await http.get(jsonUri);
+    if (response.statusCode == 200) {
+      provider.updatePercentage(0.1);
+      List<dynamic> values = json.decode(response.body)['urls'];
+      var platform = Platform.isMacOS
+          ? "macOS"
+          : Platform.isWindows
+              ? "windows"
+              : Platform.isLinux
+                  ? "linux"
+                  : "";
+      if (Platform.isMacOS) {
+        Process.run('uname', ['-m']).then((result) {
+          if (result.stdout != "x86_64") {
+            platform = "macOS-silicon";
+          }
+        });
+      }
+      var androidStudioURls = values
+          .where((element) => element["name"] == "android-studio")
+          .toList();
+      var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
+          .where((element) => element["platform"] == platform)
+          .toList();
+      print("Android Studio ($platform): ${androidStudioURL[0]["url"]}");
+      urls["Android Studio"] = androidStudioURL[0]["url"];
+      provider.updatePercentage(0.25);
+      var openJDKURls =
+          values.where((element) => element["name"] == "openJDK").toList();
+      var openJDKURL = (androidStudioURls[0]["urls"] as List<dynamic>)
+          .where((element) => element["platform"] == platform)
+          .toList();
+      print("OpenJDK ($platform): ${openJDKURL[0]["url"]}");
+      urls["OpenJDK"] = openJDKURL[0]["url"];
+      provider.updatePercentage(0.25);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    var provider = Provider.of<SplashScreenProvider>(context, listen: false);
-    provider.updatePercentage(0.8);
+    fetchURLS(context);
     return Scaffold(
       body: Container(
         width: double.infinity,
