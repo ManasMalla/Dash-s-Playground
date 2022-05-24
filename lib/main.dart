@@ -74,7 +74,6 @@ class _DashPlaygroundState extends State<DashPlayground> {
       var androidStudioURls = values
           .where((element) => element["name"] == "android-studio")
           .toList();
-      print("AS: ${androidStudioURls}");
       var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
           .where((element) => element["platform"] == platform)
           .toList();

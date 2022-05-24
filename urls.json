@@ -42,6 +42,28 @@
             "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_windows-x64_bin.zip"
           }
         ]
+      },
+      
+      {
+        "name": "Visual Studio Code",
+        "urls": [
+          {
+            "platform": "macOS",
+            "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin"
+          },
+          {
+            "platform": "macOS-silicon",
+            "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin-arm64"
+          },
+          {
+            "platform": "linux",
+            "url": "https://code.visualstudio.com/sha/download?build=stable&os=linux-x64"
+          },
+          {
+            "platform": "windows",
+            "url": "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-archive"
+          }
+        ]
       }
     ]
   }
