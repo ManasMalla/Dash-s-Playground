@@ -31,13 +31,15 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar> {
         child: Stack(
           children: [
             Center(
-              child: Text(
-                "Please Wait...",
-                style: TextStyle(
-                  fontFamily: 'Quicksand',
-                  fontSize: getProportionateHeight(16),
-                  fontWeight: FontWeight.w600,
-                  color: Color(0x3001579b),
+              child: SizedBox(
+                height: getProportionateHeight(16),
+                child: Text(
+                  "Please Wait...",
+                  style: TextStyle(
+                    fontFamily: 'Childish Reverie',
+                    fontSize: getProportionateHeight(20),
+                    color: Color(0x3001579b),
+                  ),
                 ),
               ),
             ),
@@ -51,14 +53,17 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar> {
               ),
               child: Center(
                 child: provider.percentage >= 0.4
-                    ? Text(
-                        "Loading...",
-                        style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontWeight: FontWeight.w500,
-                            fontSize: getProportionateHeight(16),
-                            color: Colors.white,
-                            overflow: TextOverflow.ellipsis),
+                    ? SizedBox(
+                        height: getProportionateHeight(16),
+                        child: Text(
+                          "Loading...",
+                          style: TextStyle(
+                              fontFamily: 'Childish Reverie',
+                              fontSize: getProportionateHeight(20),
+                              fontWeight: FontWeight.w300,
+                              color: Colors.white,
+                              overflow: TextOverflow.ellipsis),
+                        ),
                       )
                     : SizedBox(),
               ),

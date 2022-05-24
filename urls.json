@@ -23,6 +23,27 @@
         ]
       },
       {
+        "name": "cmdline-tools",
+        "urls": [
+          {
+            "platform": "macOS",
+            "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip"
+          },
+          {
+            "platform": "macOS-silicon",
+            "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip"
+          },
+          {
+            "platform": "linux",
+            "url": "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip"
+          },
+          {
+            "platform": "windows",
+            "url": "https://dl.google.com/android/repository/commandlinetools-win-8512546_latest.zip"
+          }
+        ]
+      },
+      {
         "name": "openJDK",
         "urls": [
           {
@@ -42,8 +63,7 @@
             "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_windows-x64_bin.zip"
           }
         ]
-      },
-      
+      },      
       {
         "name": "visual-studio-code",
         "urls": [

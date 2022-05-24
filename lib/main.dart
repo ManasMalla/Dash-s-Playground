@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dash_playground/home_screen.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:dash_playground/providers/splash_screen_provider.dart';
@@ -28,9 +29,16 @@ class DashPlaygroundApp extends StatefulWidget {
 class _DashPlaygroundAppState extends State<DashPlaygroundApp> {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DashPlayground(),
+      initialRoute: 'splash-screen',
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        'splash-screen': (context) => const DashPlayground(),
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        'home-screen': (context) => const HomeScreen(),
+      },
     );
   }
 }
@@ -45,6 +53,7 @@ class DashPlayground extends StatefulWidget {
 class _DashPlaygroundState extends State<DashPlayground> {
   Map<String, String> urls = {};
 
+  var isLoaded = false;
   fetchURLS(context) async {
     var provider = Provider.of<SplashScreenProvider>(context, listen: false);
     var jsonUrl =
@@ -80,6 +89,15 @@ class _DashPlaygroundState extends State<DashPlayground> {
       print("Android Studio ($platform): ${androidStudioURL[0]["url"]}");
       urls["Android Studio"] = androidStudioURL[0]["url"];
       provider.updatePercentage(0.25);
+      var cmdLineToolsURls = values
+          .where((element) => element["name"] == "cmdline-tools")
+          .toList();
+      var cmdLineToolsURL = (cmdLineToolsURls[0]["urls"] as List<dynamic>)
+          .where((element) => element["platform"] == platform)
+          .toList();
+      print("Command Line Tools ($platform): ${cmdLineToolsURL[0]["url"]}");
+      urls["Command Line Tools"] = cmdLineToolsURL[0]["url"];
+      provider.updatePercentage(0.4);
       var openJDKURls =
           values.where((element) => element["name"] == "openJDK").toList();
       var openJDKURL = (openJDKURls[0]["urls"] as List<dynamic>)
@@ -87,14 +105,36 @@ class _DashPlaygroundState extends State<DashPlayground> {
           .toList();
       print("OpenJDK ($platform): ${openJDKURL[0]["url"]}");
       urls["OpenJDK"] = openJDKURL[0]["url"];
-      provider.updatePercentage(0.25);
+      provider.updatePercentage(0.6);
+      var visualStudioCodeURLS = values
+          .where((element) => element["name"] == "visual-studio-code")
+          .toList();
+      var visualStudioCodeUrl =
+          (visualStudioCodeURLS[0]["urls"] as List<dynamic>)
+              .where((element) => element["platform"] == platform)
+              .toList();
+      print("Visual Studio Code ($platform): ${visualStudioCodeUrl[0]["url"]}");
+      urls["Visual Studio Code"] = visualStudioCodeUrl[0]["url"];
+      provider.updatePercentage(0.8);
+      //add sdk urls and install sdk
+
+      Future.delayed(const Duration(seconds: 1), () {
+        provider.updatePercentage(1.0);
+        Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+          isLoaded = true;
+          setState(() {});
+        });
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    fetchURLS(context);
+    if (urls.isEmpty) {
+      fetchURLS(context);
+    }
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -116,54 +156,34 @@ class _DashPlaygroundState extends State<DashPlayground> {
                   width: Modifier.fillMaxHeight(0.8),
                 ),
                 Column(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
                       height: getProportionateHeight(12),
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          'D',
-                          style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: getProportionateHeight(32),
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF54c5f8),
+                    SizedBox(
+                      height: getProportionateHeight(36),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'DASH\'S ',
+                            style: TextStyle(
+                              fontFamily: 'Childish Reverie',
+                              fontSize: getProportionateHeight(48),
+                              color: Color(0xFF54c5f8),
+                            ),
                           ),
-                        ),
-                        Text(
-                          'ASH\'S ',
-                          style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: getProportionateHeight(20),
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF54c5f8),
+                          Text(
+                            ' PLAYGROUND',
+                            style: TextStyle(
+                              fontFamily: 'Childish Reverie',
+                              fontSize: getProportionateHeight(48),
+                              color: Color(0xFF01579b),
+                            ),
                           ),
-                        ),
-                        Text(
-                          'P',
-                          style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: getProportionateHeight(32),
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF01579b),
-                          ),
-                        ),
-                        Text(
-                          'LAYGROUND',
-                          style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: getProportionateHeight(20),
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF01579b),
-                          ),
-                        ),
-                      ],
-                    )
+                        ],
+                      ),
+                    ),
                   ],
                 )
               ],
@@ -171,27 +191,37 @@ class _DashPlaygroundState extends State<DashPlayground> {
             SizedBox(
               height: getProportionateHeight(8),
             ),
-            AnimatedProgressBar(
-              width: 0.6,
-              duration:
-                  Platform.isMacOS || Platform.isLinux || Platform.isWindows
-                      ? Duration(seconds: 1)
-                      : Duration(seconds: 2),
+            AnimatedOpacity(
+              opacity: isLoaded ? 0 : 1,
+              duration: Duration(seconds: 1),
+              child: AnimatedProgressBar(
+                width: 0.6,
+                duration:
+                    Platform.isMacOS || Platform.isLinux || Platform.isWindows
+                        ? Duration(seconds: 1)
+                        : Duration(seconds: 2),
+              ),
             ),
             Spacer(),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: MaterialButton(
-                onPressed: () {},
-                elevation: 0,
-                height: getProportionateHeight(64),
-                child: Icon(
-                  Icons.chevron_right_rounded,
-                  color: Colors.white,
-                  size: getProportionateHeight(20),
+            AnimatedOpacity(
+              opacity: isLoaded ? 1 : 0,
+              duration: Duration(seconds: 1),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: MaterialButton(
+                  onPressed: () {
+                    Navigator.of(context).popAndPushNamed('home-screen');
+                  },
+                  elevation: 0,
+                  height: getProportionateHeight(64),
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white,
+                    size: getProportionateHeight(20),
+                  ),
+                  color: Colors.amber,
+                  shape: const CircleBorder(),
                 ),
-                color: Colors.amber,
-                shape: const CircleBorder(),
               ),
             ),
             SizedBox(
