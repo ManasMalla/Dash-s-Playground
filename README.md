@@ -1,6 +1,9 @@
 # Dash's Playground
 
-###An app for the Cross-Platform
-• Used to either install the softwares and SDK to code using Flutter (on Desktop), or,
-• Allows to code using Flutter on Android and iOS without a laptop
-• with an interactive Preview for viewing your app without deploying
+### An app for the Cross-Platform
+
+• Install the softwares and SDK to code using Flutter **on Desktop**
+
+• **Code beautiful apps with Flutter on Android and iOS** without a desktop
+
+• An **interactive Preview** for previewing your app without actually deploying
