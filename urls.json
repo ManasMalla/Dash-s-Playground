@@ -45,7 +45,7 @@
       },
       
       {
-        "name": "Visual Studio Code",
+        "name": "visual-studio-code",
         "urls": [
           {
             "platform": "macOS",
