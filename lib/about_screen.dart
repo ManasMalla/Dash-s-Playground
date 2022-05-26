@@ -79,8 +79,8 @@ class _AboutScreenState extends State<AboutScreen> {
                   ),
                   const Spacer(),
                   ClipOval(
-                    child: Image.network(
-                      'https://yt3.ggpht.com/ytc/AKedOLRt1d4p7bPylasq_66BIC8-k3hkyVjJ2JICQITK=s900-c-k-c0x00ffffff-no-rj',
+                    child: Image.asset(
+                      'assets/images/flutter.jpg',
                       height: getProportionateHeight(48),
                     ),
                   ),
@@ -127,22 +127,37 @@ class _AboutScreenState extends State<AboutScreen> {
               ),
               Align(
                 alignment: Alignment.center,
-                child: Column(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      "Developed By  ",
-                      style: TextStyle(
-                        fontFamily: 'Childish Reverie',
-                        fontSize: getProportionateHeight(20),
-                        color: ThemeConfig.onBackground.withOpacity(0.6),
-                      ),
+                    Image.network(
+                      "https://avatars.githubusercontent.com/u/38750492?v=4",
+                      height: getProportionateHeight(48),
                     ),
-                    Text(
-                      "Manas Malla ©",
-                      style: TextStyle(
-                        fontFamily: 'Childish Reverie',
-                        fontSize: getProportionateHeight(32),
-                        color: ThemeConfig.onBackground,
+                    SizedBox(
+                      width: getProportionateWidth(24),
+                    ),
+                    SizedBox(
+                      height: getProportionateHeight(52),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Developed By  ",
+                            style: TextStyle(
+                              fontFamily: 'Childish Reverie',
+                              fontSize: getProportionateHeight(20),
+                              color: ThemeConfig.onBackground.withOpacity(0.6),
+                            ),
+                          ),
+                          Text(
+                            "Manas Malla ©",
+                            style: TextStyle(
+                              fontFamily: 'Childish Reverie',
+                              fontSize: getProportionateHeight(32),
+                              color: ThemeConfig.onBackground,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

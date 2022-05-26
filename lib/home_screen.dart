@@ -1,6 +1,7 @@
 import 'package:dash_playground/about_screen.dart';
 import 'package:dash_playground/check_for_updates_screen.dart';
 import 'package:dash_playground/get_started_screen.dart';
+import 'package:dash_playground/installation_screen.dart';
 import 'package:dash_playground/review_installation_screen.dart';
 import 'package:dash_playground/utils/size_config.dart';
 import 'package:dash_playground/providers/theme_provider.dart';
@@ -33,10 +34,21 @@ class _HomeScreenState extends State<HomeScreen>
   var activeNavigationRailIndex = 0;
   var isReviewScreen = false;
   var isInstallationScreen = false;
+  var installationScreenMinimized = false;
   var installationScreenController = PageController();
 
   void setActiveNavigationRailIndex(int i) {
     activeNavigationRailIndex = i;
+    if (i != 0 && isInstallationScreen) {
+      installationScreenMinimized = true;
+    } else if (i == 0 && isInstallationScreen) {
+      installationScreenMinimized = false;
+      Future.delayed(const Duration(milliseconds: 300), () {
+        installationScreenController.animateToPage(2,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut);
+      });
+    }
     setState(() {});
   }
 
@@ -96,9 +108,10 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   )
                 : const SizedBox(),
-            !isInstallationScreen
+            (!isInstallationScreen || installationScreenMinimized)
                 ? SizedBox(
-                    width: getProportionateWidth(280),
+                    width: getProportionateWidth(
+                        activeNavigationRailIndex != 5 ? 280 : 240),
                     child: MaterialButton(
                       onPressed: () {
                         // next screen
@@ -295,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen>
                               ? const GetStartedScreen()
                               : index == 1
                                   ? const ReviewInstallationScreen()
-                                  : Container();
+                                  : InstallationScreen();
                         },
                         physics: const NeverScrollableScrollPhysics(),
                       )

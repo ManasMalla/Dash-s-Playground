@@ -226,12 +226,12 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
               provider.supportDesktop
                   ? Row(
                       children: [
-                        Image.network(
+                        Image.asset(
                           Platform.isMacOS
-                              ? 'https://upload.wikimedia.org/wikipedia/en/0/0c/Xcode_icon.png'
+                              ? 'assets/images/xcode.png'
                               : Platform.isWindows
-                                  ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Visual_Studio_Icon_2019.svg/1200px-Visual_Studio_Icon_2019.svg.png'
-                                  : 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Apt-get_logo.jpg',
+                                  ? 'assets/images/visual-studio.png'
+                                  : 'assets/images/apt-get.jpg',
                           height: getProportionateHeight(54),
                         ),
                         SizedBox(
@@ -241,7 +241,11 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextWidget(
-                                "Installs ${Platform.isMacOS ? "Xcode" : Platform.isWindows ? "Visual Studio" : "3rd party dependencies like Clang, CMake, etc."}",
+                                Platform.isMacOS
+                                    ? "Xcode"
+                                    : Platform.isWindows
+                                        ? "Visual Studio"
+                                        : "3rd party dependencies like Clang, CMake, etc.",
                                 size: getProportionateHeight(20),
                                 color: (ThemeConfig.themeMode
                                     ? Colors.white
@@ -278,8 +282,8 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
               provider.useVisualStudioCodeAsIDE
                   ? Row(
                       children: [
-                        Image.network(
-                          'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png',
+                        Image.asset(
+                          'assets/images/visual-studio-code.png',
                           height: getProportionateHeight(36),
                         ),
                         SizedBox(
@@ -289,7 +293,7 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextWidget(
-                              "Use Visual Studio Code as your IDE",
+                              "Visual Studio Code",
                               size: getProportionateHeight(24),
                               weight: FontWeight.w500,
                             ),
@@ -322,13 +326,16 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
                     width: getProportionateWidth(8),
                   ),
                   Expanded(
-                    child: TextWidget(
-                        "Android Studio's bin folder and OpenJDK's bin will be added to the PATH variable in the System Environmental Variables",
-                        size: getProportionateHeight(16),
-                        weight: FontWeight.w500,
-                        color: (ThemeConfig.themeMode
-                            ? Colors.white
-                            : Colors.black)),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 24),
+                      child: TextWidget(
+                          "Android Studio's bin folder and OpenJDK's bin will be added to the PATH variable ${Platform.isWindows ? "in the System Environmental Variables" : "for your shell"}",
+                          size: getProportionateHeight(16),
+                          weight: FontWeight.w500,
+                          color: (ThemeConfig.themeMode
+                              ? Colors.white
+                              : Colors.black)),
+                    ),
                   ),
                 ],
               ),
@@ -345,7 +352,7 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
                     size: getProportionateHeight(20),
                   ),
                   TextWidget(
-                    "${(provider.sizes['Flutter SDK'] ?? 0) + (provider.sizes['Command Line Tools'] ?? 0) + (provider.sizes['Android Studio'] ?? 0) + (provider.sizes['OpenJDK'] ?? 0) + (provider.useVisualStudioCodeAsIDE ? provider.sizes['Visual Studio Code'] ?? 0 : 0) + (provider.supportDesktop ? provider.sizes['desktop-tools'] ?? 0 : 0) + (provider.deployEmulator ? provider.sizes['systemImageSDK${provider.emulatorAPI}'] ?? 0 : 0)} MiB",
+                    "${(((provider.sizes['Flutter SDK'] ?? 0) + (provider.sizes['Command Line Tools'] ?? 0) + (provider.sizes['Android Studio'] ?? 0) + (provider.sizes['OpenJDK'] ?? 0) + (provider.useVisualStudioCodeAsIDE ? provider.sizes['Visual Studio Code'] ?? 0 : 0) + (provider.supportDesktop ? provider.sizes['desktop-tools'] ?? 0 : 0) + (provider.deployEmulator ? provider.sizes['systemImageSDK${provider.emulatorAPI}'] ?? 0 : 0)) / 1024).toStringAsFixed(2)} GiB",
                     size: getProportionateHeight(32),
                     weight: FontWeight.bold,
                     color: ThemeConfig.onBackground,
