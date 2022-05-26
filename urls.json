@@ -1,7 +1,7 @@
 {
   "urls": [
     {
-      "name": "android-studio",
+      "name": "android-studio-chipmunk",
       "urls": [
         {
           "platform": "macOS",

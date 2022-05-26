@@ -149,12 +149,18 @@ class _DashPlaygroundState extends State<DashPlayground> {
 
   fetchPlatformSpecificURL(platform, values, List<dynamic> flutterSDKSizes,
       List<dynamic> desktopToolsSizes, List<dynamic> systemImageSizes) {
-    var androidStudioURls =
-        values.where((element) => element["name"] == "android-studio").toList();
+    var androidStudioURls = values
+        .where((element) => element["name"].contains("android-studio"))
+        .toList();
     var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
         .where((element) => element["platform"] == platform)
         .toList();
     provider.urls["Android Studio"] = androidStudioURL[0]["url"];
+    provider.setAndroidStudioCodename(androidStudioURL[0]["name"]
+        .toString()
+        .split("android-studio")
+        .first
+        .capitalize());
     provider.sizes["Android Studio"] = int.tryParse(
             androidStudioURL[0]["size"].toString().replaceAll(" MiB", "")) ??
         0;

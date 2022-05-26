@@ -347,7 +347,7 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   TextWidget(
-                    "Total Download Size: ",
+                    "Total Download Size: ~",
                     color: const Color(0xFF54c5f8),
                     size: getProportionateHeight(20),
                   ),

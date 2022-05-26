@@ -10,6 +10,14 @@ class InstallationProvider extends ChangeNotifier {
   int emulatorAPI = 33;
   bool useVisualStudioCodeAsIDE = false;
   bool supportDesktop = true;
+  String androidStudioCodename = "";
+
+  setAndroidStudioCodename(_) {
+    androidStudioCodename = _;
+    print(androidStudioCodename);
+    notifyListeners();
+  }
+
   setFlutterChannel(FlutterChannel _) {
     flutterChannel = _;
     notifyListeners();

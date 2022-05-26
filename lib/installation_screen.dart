@@ -1,8 +1,15 @@
+import 'dart:io';
+
+import 'package:dash_playground/providers/installation_provider.dart';
 import 'package:dash_playground/providers/theme_provider.dart';
 import 'package:dash_playground/utils/modifiers.dart';
 import 'package:dash_playground/utils/size_config.dart';
 import 'package:dash_playground/utils/text_widget.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class InstallationScreen extends StatefulWidget {
   const InstallationScreen({Key? key}) : super(key: key);
@@ -14,11 +21,67 @@ class InstallationScreen extends StatefulWidget {
 class _InstallationScreenState extends State<InstallationScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late InstallationProvider provider;
   double downloadPercentage = 0.3;
+  double numberOfDownloads = 5;
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    provider = Provider.of<InstallationProvider>(context, listen: false);
+    getTemporaryDirectory().then((temporaryDirectory) {
+      //get url
+      var forPlatform =
+          'for ${Platform.isMacOS ? "Mac" : Platform.isWindows ? "Windows" : "Linux"}';
+      var androidStudioVersion = "Chipmunk";
+
+      var urls = {
+        'Command Line Tools $forPlatform': provider.urls['Command Line Tools'],
+        'Android Studio $androidStudioVersion | ${provider.urls['Android Studio']?.split("android-studio-").last.split("-").first.split(".").take(3).join(".")} $forPlatform':
+            provider.urls['Android Studio'],
+        'OpenJDK ${provider.urls['OpenJDK']?.split("openjdk-").last.split("_").first.split(".").take(3).join(".")} $forPlatform':
+            provider.urls['OpenJDK'],
+      };
+      //Terminal/CMD/Shell - Flutter SDK, Android SDK Components, Android Emulator, Desktop Tools
+      if (provider.useVisualStudioCodeAsIDE) {
+        urls['Visual Studio Code $forPlatform'] =
+            (provider.urls['Visual Studio Code']);
+        numberOfDownloads++;
+      }
+      if (provider.deployEmulator) {
+        numberOfDownloads++;
+      }
+      if (provider.supportDesktop) {
+        numberOfDownloads++;
+      }
+
+      urls.forEach((key, value) {
+        print(key);
+      });
+
+      // for (var entry in provider.urls.entries) {
+      //   var name = entry.key;
+      //   var url = entry.value;
+      //   var formattedName = name == "Android Studio"
+      //       ? "Android Studio"
+      //       : name == "OpenJDK"
+      //           ? "OpenJDK 18.0.1"
+      //           : name == "Flutter SDK"
+      //               ? "Flutter SDK 3.10.0"
+      //               : name;
+
+      // download the files
+      //   Dio dio = Dio();
+      //   dio.download(
+      //     url,
+      //     "${temporaryDirectory.path}/VSCode-darwin.zip",
+      //     onReceiveProgress: (count, total) {
+      //       var percentage = count * 100 / total;
+      //       print(percentage);
+      //     },
+      //   );
+      // }
+    });
   }
 
   @override
@@ -45,7 +108,8 @@ class _InstallationScreenState extends State<InstallationScreen>
           child: TextWidget(
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit lorem ipsum.\nPraesent vehicula turpis augue, in vestibulum ante tincidunt vel.",
               align: TextAlign.center,
-              color: Colors.grey.shade900),
+              color:
+                  ThemeConfig.themeMode ? Colors.grey : Colors.grey.shade900),
         ),
         Expanded(
           child: Stack(
@@ -60,7 +124,7 @@ class _InstallationScreenState extends State<InstallationScreen>
                       'assets/images/android-studio-bumblebee.png',
                     ),
                     borderRadius:
-                        BorderRadius.circular(getProportionateHeight(54)),
+                        BorderRadius.circular(getProportionateHeight(32)),
                   ),
                 ),
               ),
