@@ -147,8 +147,8 @@ class _DashPlaygroundState extends State<DashPlayground> {
     }
   }
 
-  fetchPlatformSpecificURL(platform, values, flutterSDKSizes, desktopToolsSizes,
-      List<dynamic> systemImageSizes) {
+  fetchPlatformSpecificURL(platform, values, List<dynamic> flutterSDKSizes,
+      List<dynamic> desktopToolsSizes, List<dynamic> systemImageSizes) {
     var androidStudioURls =
         values.where((element) => element["name"] == "android-studio").toList();
     var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
@@ -195,29 +195,34 @@ class _DashPlaygroundState extends State<DashPlayground> {
     uiProvider.updatePercentage(0.8);
 
     provider.sizes['Flutter SDK'] = int.tryParse(flutterSDKSizes
-            .where((element) => element["platform"] == platform)['size']
+            .firstWhere((element) => element["platform"] == platform)['size']
             .toString()
             .replaceAll(" MiB", "")) ??
         0;
     provider.sizes['desktop-tools'] = int.tryParse(desktopToolsSizes
-            .where((element) => element["platform"] == platform)['size']
+            .firstWhere((element) => element["platform"] == platform)['size']
             .toString()
             .replaceAll(" MiB", "")) ??
         0;
     systemImageSizes.forEach((element) {
       provider.sizes[
-              'systemImageSDK${(element as Map<String, int>).entries.first.key}'] =
-          element.entries.first.value;
+              'systemImageSDK${(element as Map<String, dynamic>).entries.first.key}'] =
+          int.tryParse(element.entries.first.value) ?? 0;
     });
 
     uiProvider.updatePercentage(1.0);
 
     Future.delayed(const Duration(seconds: 1), () {
-      // urls.entries
-      //     .map((e) => "${e.key} ($platform): ${e.value}")
-      //     .forEach((element) {
-      //   print(element);
-      // });
+      provider.urls.entries
+          .map((e) => "${e.key} ($platform): ${e.value}")
+          .forEach((element) {
+        print(element);
+      });
+      provider.sizes.entries
+          .map((e) => "${e.key} ($platform): ${e.value}")
+          .forEach((element) {
+        print(element);
+      });
 
       Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
         isLoaded = true;
@@ -298,7 +303,7 @@ class _DashPlaygroundState extends State<DashPlayground> {
             ),
             AnimatedOpacity(
               opacity: isLoaded ? 0 : 1,
-              duration: const Duration(seconds: 1),
+              duration: const Duration(milliseconds: 300),
               child: AnimatedProgressBar(
                 width: 0.6,
                 duration:
@@ -310,7 +315,7 @@ class _DashPlaygroundState extends State<DashPlayground> {
             const Spacer(),
             AnimatedOpacity(
               opacity: isLoaded ? 1 : 0,
-              duration: const Duration(seconds: 1),
+              duration: const Duration(milliseconds: 300),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: MaterialButton(
