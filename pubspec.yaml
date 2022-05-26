@@ -39,6 +39,7 @@ dependencies:
   process_run: ^0.12.3+2
   path_provider: ^2.0.10
   dio: ^4.0.6
+  archive: ^3.3.0
 
 dev_dependencies:
   flutter_test:

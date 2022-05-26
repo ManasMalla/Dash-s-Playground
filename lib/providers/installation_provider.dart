@@ -12,9 +12,21 @@ class InstallationProvider extends ChangeNotifier {
   bool supportDesktop = true;
   String androidStudioCodename = "";
 
+  String currentlyDownloading = "";
+  int downloadProgress = 0;
+
+  setCurrentlyDownloading(_) {
+    currentlyDownloading = _;
+    notifyListeners();
+  }
+
+  setDownloadProgress(int _) {
+    downloadProgress = _;
+    notifyListeners();
+  }
+
   setAndroidStudioCodename(_) {
     androidStudioCodename = _;
-    print(androidStudioCodename);
     notifyListeners();
   }
 

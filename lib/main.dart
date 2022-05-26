@@ -150,16 +150,18 @@ class _DashPlaygroundState extends State<DashPlayground> {
   fetchPlatformSpecificURL(platform, values, List<dynamic> flutterSDKSizes,
       List<dynamic> desktopToolsSizes, List<dynamic> systemImageSizes) {
     var androidStudioURls = values
-        .where((element) => element["name"].contains("android-studio"))
+        .where(
+            (element) => element["name"].toString().contains("android-studio"))
         .toList();
     var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
         .where((element) => element["platform"] == platform)
         .toList();
     provider.urls["Android Studio"] = androidStudioURL[0]["url"];
-    provider.setAndroidStudioCodename(androidStudioURL[0]["name"]
+
+    provider.setAndroidStudioCodename(androidStudioURls[0]["name"]
         .toString()
-        .split("android-studio")
-        .first
+        .split("android-studio-")
+        .last
         .capitalize());
     provider.sizes["Android Studio"] = int.tryParse(
             androidStudioURL[0]["size"].toString().replaceAll(" MiB", "")) ??
@@ -219,16 +221,16 @@ class _DashPlaygroundState extends State<DashPlayground> {
     uiProvider.updatePercentage(1.0);
 
     Future.delayed(const Duration(seconds: 1), () {
-      provider.urls.entries
-          .map((e) => "${e.key} ($platform): ${e.value}")
-          .forEach((element) {
-        print(element);
-      });
-      provider.sizes.entries
-          .map((e) => "${e.key} ($platform): ${e.value}")
-          .forEach((element) {
-        print(element);
-      });
+      // provider.urls.entries
+      //     .map((e) => "${e.key} ($platform): ${e.value}")
+      //     .forEach((element) {
+      //   print(element);
+      // });
+      // provider.sizes.entries
+      //     .map((e) => "${e.key} ($platform): ${e.value}")
+      //     .forEach((element) {
+      //   print(element);
+      // });
 
       Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
         isLoaded = true;

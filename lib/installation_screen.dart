@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:archive/archive.dart';
 import 'package:dash_playground/providers/installation_provider.dart';
 import 'package:dash_playground/providers/theme_provider.dart';
 import 'package:dash_playground/utils/modifiers.dart';
@@ -24,24 +25,25 @@ class _InstallationScreenState extends State<InstallationScreen>
   late InstallationProvider provider;
   double downloadPercentage = 0.3;
   double numberOfDownloads = 5;
+  String title = "";
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
     provider = Provider.of<InstallationProvider>(context, listen: false);
-    getTemporaryDirectory().then((temporaryDirectory) {
+    getTemporaryDirectory().then((temporaryDirectory) async {
       //get url
       var forPlatform =
           'for ${Platform.isMacOS ? "Mac" : Platform.isWindows ? "Windows" : "Linux"}';
-      var androidStudioVersion = "Chipmunk";
 
       var urls = {
-        'Command Line Tools $forPlatform': provider.urls['Command Line Tools'],
-        'Android Studio $androidStudioVersion | ${provider.urls['Android Studio']?.split("android-studio-").last.split("-").first.split(".").take(3).join(".")} $forPlatform':
+        'Android Studio ${provider.androidStudioCodename} | ${provider.urls['Android Studio']?.split("android-studio-").last.split("-").first.split(".").take(3).join(".")} $forPlatform':
             provider.urls['Android Studio'],
+        'Command Line Tools $forPlatform': provider.urls['Command Line Tools'],
         'OpenJDK ${provider.urls['OpenJDK']?.split("openjdk-").last.split("_").first.split(".").take(3).join(".")} $forPlatform':
             provider.urls['OpenJDK'],
       };
+
       //Terminal/CMD/Shell - Flutter SDK, Android SDK Components, Android Emulator, Desktop Tools
       if (provider.useVisualStudioCodeAsIDE) {
         urls['Visual Studio Code $forPlatform'] =
@@ -55,33 +57,65 @@ class _InstallationScreenState extends State<InstallationScreen>
         numberOfDownloads++;
       }
 
-      urls.forEach((key, value) {
-        print(key);
-      });
-
-      // for (var entry in provider.urls.entries) {
-      //   var name = entry.key;
-      //   var url = entry.value;
-      //   var formattedName = name == "Android Studio"
-      //       ? "Android Studio"
-      //       : name == "OpenJDK"
-      //           ? "OpenJDK 18.0.1"
-      //           : name == "Flutter SDK"
-      //               ? "Flutter SDK 3.10.0"
-      //               : name;
-
-      // download the files
-      //   Dio dio = Dio();
-      //   dio.download(
-      //     url,
-      //     "${temporaryDirectory.path}/VSCode-darwin.zip",
-      //     onReceiveProgress: (count, total) {
-      //       var percentage = count * 100 / total;
-      //       print(percentage);
-      //     },
-      //   );
-      // }
+      //download the files
+      Dio dio = Dio();
+      for (var entry in urls.entries) {
+        provider.setCurrentlyDownloading(entry.key);
+        var url = entry.value;
+        print(entry.key);
+        print(url);
+        var fileName = entry.key.contains("Visual Studio Code")
+            ? Platform.isMacOS
+                ? "VSCode-darwin.zip"
+                : Platform.isLinux
+                    ? "code-stable-x64.tar.gz"
+                    : "VSCode-win32-x64.zip"
+            : url?.split("/").last;
+        var fileURL = "${temporaryDirectory.path}/Dash's Playground/$fileName";
+        if (url != null) {
+          await dio.download(
+            url,
+            fileURL,
+            onReceiveProgress: (count, total) {
+              var percentage = count * 100 / total;
+              provider.setDownloadProgress(percentage.round());
+            },
+          ).then((value) {
+            File downloadedFile = File(fileURL);
+            unarchiveAndSave(
+                downloadedFile, "${temporaryDirectory.path}/Dash's Playground");
+          });
+        }
+      }
     });
+  }
+
+  unarchiveAndSave(File zippedFile, _dir) async {
+    var bytes = zippedFile.readAsBytesSync();
+    if (zippedFile.path.endsWith(".zip")) {
+      var archive = ZipDecoder().decodeBytes(bytes);
+      for (var file in archive) {
+        var fileName = '$_dir/${file.name}';
+        if (file.isFile) {
+          var outFile = File(fileName);
+          outFile = await outFile.create(recursive: true);
+          await outFile.writeAsBytes(file.content);
+          print("Extracted: ${zippedFile.path}");
+        }
+      }
+    } else {
+      var tarArchive = GZipDecoder().decodeBytes(bytes);
+      var archive = TarDecoder().decodeBytes(tarArchive);
+      for (var file in archive) {
+        var fileName = '$_dir/${file.name}';
+        if (file.isFile) {
+          var outFile = File(fileName);
+          outFile = await outFile.create(recursive: true);
+          await outFile.writeAsBytes(file.content);
+          print("Extracted: ${zippedFile.path}");
+        }
+      }
+    }
   }
 
   @override
@@ -146,20 +180,23 @@ class _InstallationScreenState extends State<InstallationScreen>
           padding: EdgeInsets.symmetric(
               vertical: getProportionateHeight(12),
               horizontal: getProportionateWidth(32)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextWidget(
-                "Downloading Android Studio Chipmunk | 2021.2.1 for Mac",
-                size: getProportionateHeight(18),
-              ),
-              TextWidget(
-                "18%",
-                size: getProportionateHeight(18),
-                weight: FontWeight.bold,
-              ),
-            ],
-          ),
+          child: Consumer<InstallationProvider>(
+              builder: (context, progressProvider, __) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextWidget(
+                  "Downloading ${progressProvider.currentlyDownloading}",
+                  size: getProportionateHeight(18),
+                ),
+                TextWidget(
+                  "${progressProvider.downloadProgress}%",
+                  size: getProportionateHeight(18),
+                  weight: FontWeight.bold,
+                ),
+              ],
+            );
+          }),
         ),
         Container(
           width: double.infinity,
@@ -167,16 +204,21 @@ class _InstallationScreenState extends State<InstallationScreen>
           color: ThemeConfig.primary.withOpacity(0.2),
           child: Stack(
             children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: Modifier.fillMaxWidth(1.0) * downloadPercentage,
-                height: getProportionateHeight(32),
-                decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.horizontal(right: Radius.circular(28)),
-                  color: ThemeConfig.primary,
-                ),
-              ),
+              Consumer<InstallationProvider>(
+                  builder: (context, progressProvider, _) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: Modifier.fillMaxWidth(1.0) *
+                      ((progressProvider.downloadProgress / numberOfDownloads) /
+                          100),
+                  height: getProportionateHeight(32),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.horizontal(
+                        right: Radius.circular(28)),
+                    color: ThemeConfig.primary,
+                  ),
+                );
+              }),
             ],
           ),
         ),
