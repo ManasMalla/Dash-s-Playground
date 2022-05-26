@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dash_playground/home_screen.dart';
+import 'package:dash_playground/providers/installation_provider.dart';
+import 'package:dash_playground/utils/platform_extension.dart';
+import 'package:dash_playground/providers/theme_provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:dash_playground/providers/splash_screen_provider.dart';
@@ -11,12 +14,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => SplashScreenProvider(),
-      child: DashPlaygroundApp(),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (_) => SplashScreenProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => InstallationProvider(),
+      ),
+    ],
+    child: const DashPlaygroundApp(),
+  ));
+}
+
+Future<void> setPrefThemeMode(BuildContext context) async {
+  var systemThemeMode =
+      WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+  var themeMode = systemThemeMode ? ThemeMode.dark : ThemeMode.light;
+  Provider.of<ThemeProvider>(context, listen: false).changeThemeMode(themeMode);
 }
 
 class DashPlaygroundApp extends StatefulWidget {
@@ -26,13 +44,39 @@ class DashPlaygroundApp extends StatefulWidget {
   State<DashPlaygroundApp> createState() => _DashPlaygroundAppState();
 }
 
-class _DashPlaygroundAppState extends State<DashPlaygroundApp> {
+class _DashPlaygroundAppState extends State<DashPlaygroundApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    // connect();
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setPrefThemeMode(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setPrefThemeMode(context);
+    super.didChangePlatformBrightness();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DashPlayground(),
+      home: const DashPlayground(),
       initialRoute: 'splash-screen',
+      theme: ThemeData.fallback().copyWith(
+        useMaterial3: true,
+      ),
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
         'splash-screen': (context) => const DashPlayground(),
@@ -51,11 +95,19 @@ class DashPlayground extends StatefulWidget {
 }
 
 class _DashPlaygroundState extends State<DashPlayground> {
-  Map<String, String> urls = {};
-
   var isLoaded = false;
-  fetchURLS(context) async {
-    var provider = Provider.of<SplashScreenProvider>(context, listen: false);
+  late InstallationProvider provider;
+  late SplashScreenProvider uiProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    provider = Provider.of<InstallationProvider>(context, listen: false);
+
+    uiProvider = Provider.of<SplashScreenProvider>(context, listen: false);
+  }
+
+  fetchJSON(context) async {
     var jsonUrl =
         "https://raw.githubusercontent.com/ManasMalla/Dash-s-Playground/main/urls.json";
     var jsonUri = Uri.tryParse(jsonUrl);
@@ -64,7 +116,7 @@ class _DashPlaygroundState extends State<DashPlayground> {
     }
     final response = await http.get(jsonUri);
     if (response.statusCode == 200) {
-      provider.updatePercentage(0.1);
+      uiProvider.updatePercentage(0.1);
       List<dynamic> values = json.decode(response.body)['urls'];
       var platform = Platform.isMacOS
           ? "macOS"
@@ -75,64 +127,91 @@ class _DashPlaygroundState extends State<DashPlayground> {
                   : "";
       if (Platform.isMacOS) {
         Process.run('uname', ['-m']).then((result) {
-          if (result.stdout != "x86_64") {
+          if (!(result.stdout as String).contains("x86_64") &&
+              result.stdout != "") {
             platform = "macOS-silicon";
           }
+          fetchPlatformSpecificURL(platform, values);
         });
+      } else {
+        fetchPlatformSpecificURL(platform, values);
       }
-      var androidStudioURls = values
-          .where((element) => element["name"] == "android-studio")
-          .toList();
-      var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
-          .where((element) => element["platform"] == platform)
-          .toList();
-      print("Android Studio ($platform): ${androidStudioURL[0]["url"]}");
-      urls["Android Studio"] = androidStudioURL[0]["url"];
-      provider.updatePercentage(0.25);
-      var cmdLineToolsURls = values
-          .where((element) => element["name"] == "cmdline-tools")
-          .toList();
-      var cmdLineToolsURL = (cmdLineToolsURls[0]["urls"] as List<dynamic>)
-          .where((element) => element["platform"] == platform)
-          .toList();
-      print("Command Line Tools ($platform): ${cmdLineToolsURL[0]["url"]}");
-      urls["Command Line Tools"] = cmdLineToolsURL[0]["url"];
-      provider.updatePercentage(0.4);
-      var openJDKURls =
-          values.where((element) => element["name"] == "openJDK").toList();
-      var openJDKURL = (openJDKURls[0]["urls"] as List<dynamic>)
-          .where((element) => element["platform"] == platform)
-          .toList();
-      print("OpenJDK ($platform): ${openJDKURL[0]["url"]}");
-      urls["OpenJDK"] = openJDKURL[0]["url"];
-      provider.updatePercentage(0.6);
-      var visualStudioCodeURLS = values
-          .where((element) => element["name"] == "visual-studio-code")
-          .toList();
-      var visualStudioCodeUrl =
-          (visualStudioCodeURLS[0]["urls"] as List<dynamic>)
-              .where((element) => element["platform"] == platform)
-              .toList();
-      print("Visual Studio Code ($platform): ${visualStudioCodeUrl[0]["url"]}");
-      urls["Visual Studio Code"] = visualStudioCodeUrl[0]["url"];
-      provider.updatePercentage(0.8);
-      //add sdk urls and install sdk
-
-      Future.delayed(const Duration(seconds: 1), () {
-        provider.updatePercentage(1.0);
-        Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
-          isLoaded = true;
-          setState(() {});
-        });
-      });
     }
+  }
+
+  fetchPlatformSpecificURL(platform, values) {
+    var androidStudioURls =
+        values.where((element) => element["name"] == "android-studio").toList();
+    var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
+        .where((element) => element["platform"] == platform)
+        .toList();
+    provider.urls["Android Studio"] = androidStudioURL[0]["url"];
+    provider.sizes["Android Studio"] = int.tryParse(
+            androidStudioURL[0]["size"].toString().replaceAll(" MiB", "")) ??
+        0;
+    uiProvider.updatePercentage(0.25);
+
+    var cmdLineToolsURls =
+        values.where((element) => element["name"] == "cmdline-tools").toList();
+    var cmdLineToolsURL = (cmdLineToolsURls[0]["urls"] as List<dynamic>)
+        .where((element) => element["platform"] == platform)
+        .toList();
+    provider.urls["Command Line Tools"] = cmdLineToolsURL[0]["url"];
+    provider.sizes["Command Line Tools"] = int.tryParse(
+            cmdLineToolsURL[0]["size"].toString().replaceAll(" MiB", "")) ??
+        0;
+    uiProvider.updatePercentage(0.4);
+
+    var openJDKURls =
+        values.where((element) => element["name"] == "openJDK").toList();
+    var openJDKURL = (openJDKURls[0]["urls"] as List<dynamic>)
+        .where((element) => element["platform"] == platform)
+        .toList();
+    provider.urls["OpenJDK"] = openJDKURL[0]["url"];
+    provider.sizes["OpenJDK"] =
+        int.tryParse(openJDKURL[0]["size"].toString().replaceAll(" MiB", "")) ??
+            0;
+    uiProvider.updatePercentage(0.6);
+
+    var visualStudioCodeURLS = values
+        .where((element) => element["name"] == "visual-studio-code")
+        .toList();
+    var visualStudioCodeUrl = (visualStudioCodeURLS[0]["urls"] as List<dynamic>)
+        .where((element) => element["platform"] == platform)
+        .toList();
+    provider.urls["Visual Studio Code"] = visualStudioCodeUrl[0]["url"];
+    provider.sizes["Visual Studio Code"] = int.tryParse(
+            visualStudioCodeUrl[0]["size"].toString().replaceAll(" MiB", "")) ??
+        0;
+    uiProvider.updatePercentage(0.8);
+
+    Future.delayed(const Duration(seconds: 1), () {
+      // urls.entries
+      //     .map((e) => "${e.key} ($platform): ${e.value}")
+      //     .forEach((element) {
+      //   print(element);
+      // });
+      uiProvider.updatePercentage(1.0);
+
+      Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+        isLoaded = true;
+        setState(() {});
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    if (urls.isEmpty) {
-      fetchURLS(context);
+    if (provider.urls.isEmpty &&
+        platformCategory() != PlatformCategory.mobile) {
+      fetchJSON(context);
+    } else if (platformCategory() == PlatformCategory.mobile) {
+      uiProvider.updatePercentage(1.0);
+      Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+        isLoaded = true;
+        setState(() {});
+      });
     }
 
     return Scaffold(
@@ -170,7 +249,7 @@ class _DashPlaygroundState extends State<DashPlayground> {
                             style: TextStyle(
                               fontFamily: 'Childish Reverie',
                               fontSize: getProportionateHeight(48),
-                              color: Color(0xFF54c5f8),
+                              color: const Color(0xFF54c5f8),
                             ),
                           ),
                           Text(
@@ -178,7 +257,7 @@ class _DashPlaygroundState extends State<DashPlayground> {
                             style: TextStyle(
                               fontFamily: 'Childish Reverie',
                               fontSize: getProportionateHeight(48),
-                              color: Color(0xFF01579b),
+                              color: const Color(0xFF01579b),
                             ),
                           ),
                         ],
@@ -193,19 +272,19 @@ class _DashPlaygroundState extends State<DashPlayground> {
             ),
             AnimatedOpacity(
               opacity: isLoaded ? 0 : 1,
-              duration: Duration(seconds: 1),
+              duration: const Duration(seconds: 1),
               child: AnimatedProgressBar(
                 width: 0.6,
                 duration:
                     Platform.isMacOS || Platform.isLinux || Platform.isWindows
-                        ? Duration(seconds: 1)
-                        : Duration(seconds: 2),
+                        ? const Duration(seconds: 1)
+                        : const Duration(seconds: 2),
               ),
             ),
-            Spacer(),
+            const Spacer(),
             AnimatedOpacity(
               opacity: isLoaded ? 1 : 0,
-              duration: Duration(seconds: 1),
+              duration: const Duration(seconds: 1),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: MaterialButton(

@@ -8,7 +8,7 @@
 PRODUCT_NAME = dash_playground
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.dashPlayground
+PRODUCT_BUNDLE_IDENTIFIER = com.manasmalla.dashplayground;
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2022 com.example. All rights reserved.

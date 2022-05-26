@@ -5,19 +5,23 @@
         "urls": [
           {
             "platform": "macOS",
-            "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.14/android-studio-2021.2.1.14-mac.zip"
+            "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-mac.zip", 
+            "size": "1017 MiB"
           },
           {
             "platform": "macOS-silicon",
-            "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.14/android-studio-2021.2.1.14-mac_arm.zip"
+            "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-mac_arm.zip", 
+            "size": "1014 MiB"
           },
           {
             "platform": "linux",
-            "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.14/android-studio-2021.2.1.14-linux.tar.gz"
+            "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-linux.tar.gz", 
+            "size": "964 MiB"
           },
           {
             "platform": "windows",
-            "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.14/android-studio-2021.2.1.14-windows.zip"
+            "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-windows.zip", 
+            "size": "940 MiB"
           }
         ]
       },
@@ -26,19 +30,23 @@
         "urls": [
           {
             "platform": "macOS",
-            "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip"
+            "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip", 
+            "size": "108 MiB"
           },
           {
             "platform": "macOS-silicon",
-            "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip"
+            "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip", 
+            "size": "108 MiB"
           },
           {
             "platform": "linux",
-            "url": "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip"
+            "url": "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip", 
+            "size": "108 MiB"
           },
           {
             "platform": "windows",
-            "url": "https://dl.google.com/android/repository/commandlinetools-win-8512546_latest.zip"
+            "url": "https://dl.google.com/android/repository/commandlinetools-win-8512546_latest.zip", 
+            "size": "108 MiB"
           }
         ]
       },
@@ -47,19 +55,23 @@
         "urls": [
           {
             "platform": "macOS",
-            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-x64_bin.tar.gz"
+            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-x64_bin.tar.gz", 
+            "size": "177 MiB"
           },
           {
             "platform": "macOS-silicon",
-            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-aarch64_bin.tar.gz"
+            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-aarch64_bin.tar.gz", 
+            "size": "175 MiB"
           },
           {
             "platform": "linux",
-            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_linux-x64_bin.tar.gz"
+            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_linux-x64_bin.tar.gz", 
+            "size": "180 MiB"
           },
           {
             "platform": "windows",
-            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_windows-x64_bin.zip"
+            "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_windows-x64_bin.zip", 
+            "size": "179 MiB"
           }
         ]
       },
@@ -68,19 +80,23 @@
         "urls": [
           {
             "platform": "macOS",
-            "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin"
+            "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin", 
+            "size": "104 MiB"
           },
           {
             "platform": "macOS-silicon",
-            "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin-arm64"
+            "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin-arm64", 
+            "size": "103 MiB"
           },
           {
             "platform": "linux",
-            "url": "https://code.visualstudio.com/sha/download?build=stable&os=linux-x64"
+            "url": "https://code.visualstudio.com/sha/download?build=stable&os=linux-x64", 
+            "size": "110 MiB"
           },
           {
             "platform": "windows",
-            "url": "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-archive"
+            "url": "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-archive", 
+            "size": "104 MiB"
           }
         ]
       }

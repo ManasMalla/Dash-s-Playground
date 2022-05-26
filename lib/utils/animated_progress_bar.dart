@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AnimatedProgressBar extends StatefulWidget {
-  final width;
-  final duration;
+  final double width;
+  final Duration duration;
   const AnimatedProgressBar(
       {Key? key,
       required this.width,
@@ -38,7 +38,7 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar> {
                   style: TextStyle(
                     fontFamily: 'Childish Reverie',
                     fontSize: getProportionateHeight(20),
-                    color: Color(0x3001579b),
+                    color: const Color(0x3001579b),
                   ),
                 ),
               ),
@@ -49,7 +49,7 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar> {
               height: getProportionateHeight(32),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
-                color: Color(0xFF01579b),
+                color: const Color(0xFF01579b),
               ),
               child: Center(
                 child: provider.percentage >= 0.4
@@ -65,7 +65,7 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar> {
                               overflow: TextOverflow.ellipsis),
                         ),
                       )
-                    : SizedBox(),
+                    : const SizedBox(),
               ),
             ),
           ],
