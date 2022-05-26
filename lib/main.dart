@@ -118,6 +118,12 @@ class _DashPlaygroundState extends State<DashPlayground> {
     if (response.statusCode == 200) {
       uiProvider.updatePercentage(0.1);
       List<dynamic> values = json.decode(response.body)['urls'];
+      List<dynamic> desktopSizesList =
+          json.decode(response.body)['desktop-tools'];
+      List<dynamic> flutterSDKSizesList =
+          json.decode(response.body)['flutter-sdk'];
+      List<dynamic> emulatorSizesList =
+          json.decode(response.body)['emulator-size'];
       var platform = Platform.isMacOS
           ? "macOS"
           : Platform.isWindows
@@ -131,15 +137,18 @@ class _DashPlaygroundState extends State<DashPlayground> {
               result.stdout != "") {
             platform = "macOS-silicon";
           }
-          fetchPlatformSpecificURL(platform, values);
+          fetchPlatformSpecificURL(platform, values, flutterSDKSizesList,
+              desktopSizesList, emulatorSizesList);
         });
       } else {
-        fetchPlatformSpecificURL(platform, values);
+        fetchPlatformSpecificURL(platform, values, flutterSDKSizesList,
+            desktopSizesList, emulatorSizesList);
       }
     }
   }
 
-  fetchPlatformSpecificURL(platform, values) {
+  fetchPlatformSpecificURL(platform, values, flutterSDKSizes, desktopToolsSizes,
+      List<dynamic> systemImageSizes) {
     var androidStudioURls =
         values.where((element) => element["name"] == "android-studio").toList();
     var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
@@ -185,13 +194,30 @@ class _DashPlaygroundState extends State<DashPlayground> {
         0;
     uiProvider.updatePercentage(0.8);
 
+    provider.sizes['Flutter SDK'] = int.tryParse(flutterSDKSizes
+            .where((element) => element["platform"] == platform)['size']
+            .toString()
+            .replaceAll(" MiB", "")) ??
+        0;
+    provider.sizes['desktop-tools'] = int.tryParse(desktopToolsSizes
+            .where((element) => element["platform"] == platform)['size']
+            .toString()
+            .replaceAll(" MiB", "")) ??
+        0;
+    systemImageSizes.forEach((element) {
+      provider.sizes[
+              'systemImageSDK${(element as Map<String, int>).entries.first.key}'] =
+          element.entries.first.value;
+    });
+
+    uiProvider.updatePercentage(1.0);
+
     Future.delayed(const Duration(seconds: 1), () {
       // urls.entries
       //     .map((e) => "${e.key} ($platform): ${e.value}")
       //     .forEach((element) {
       //   print(element);
       // });
-      uiProvider.updatePercentage(1.0);
 
       Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
         isLoaded = true;

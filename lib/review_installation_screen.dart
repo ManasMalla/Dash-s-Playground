@@ -28,7 +28,6 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
     super.initState();
     _controller = AnimationController(vsync: this);
     provider = Provider.of<InstallationProvider>(context, listen: false);
-    print(provider.sizes);
   }
 
   @override
@@ -36,12 +35,6 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
     super.dispose();
     _controller.dispose();
   }
-
-  var flutterSDKSize = Platform.isMacOS
-      ? 1200
-      : Platform.isWindows
-          ? 896
-          : 598;
 
   var targetAPIs = const {
     33: "Android 13 Preview",
@@ -352,7 +345,7 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
                     size: getProportionateHeight(20),
                   ),
                   TextWidget(
-                    "${flutterSDKSize + (provider.sizes['Android Studio'] ?? 0) + (provider.sizes['OpenJDK'] ?? 0) + (provider.useVisualStudioCodeAsIDE ? provider.sizes['Visual Studio Code'] ?? 0 : 0)} MiB",
+                    "${(provider.sizes['Flutter SDK'] ?? 0) + (provider.sizes['Command Line Tools'] ?? 0) + (provider.sizes['Android Studio'] ?? 0) + (provider.sizes['OpenJDK'] ?? 0) + (provider.useVisualStudioCodeAsIDE ? provider.sizes['Visual Studio Code'] ?? 0 : 0) + (provider.supportDesktop ? provider.sizes['desktop-tools'] ?? 0 : 0) + (provider.deployEmulator ? provider.sizes['systemImageSDK${provider.emulatorAPI}'] ?? 0 : 0)} MiB",
                     size: getProportionateHeight(32),
                     weight: FontWeight.bold,
                     color: ThemeConfig.onBackground,
