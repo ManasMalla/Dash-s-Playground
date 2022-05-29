@@ -9,7 +9,7 @@ import 'package:dash_playground/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-enum FlutterChannel { stable, beta, dev, master }
+enum FlutterChannel { stable, beta, master }
 
 class GetStartedScreen extends StatefulWidget {
   const GetStartedScreen({Key? key}) : super(key: key);
@@ -109,7 +109,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                           children: [
                             FlutterChannel.stable,
                             FlutterChannel.beta,
-                            FlutterChannel.dev,
                             FlutterChannel.master
                           ]
                               .map((e) => Expanded(

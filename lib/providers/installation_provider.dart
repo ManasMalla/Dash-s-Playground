@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dash_playground/get_started_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +16,38 @@ class InstallationProvider extends ChangeNotifier {
 
   String currentlyDownloading = "";
   int downloadProgress = 0;
+  var isExtracting = false;
+  var isInstalling = false;
+  var isCurrentlyDownloading = false;
+
+  List<File> downloadedFiles = [];
+
+  String accountPassword = "";
+
+  addDownloadedFile(_) {
+    downloadedFiles.add(_);
+    notifyListeners();
+  }
+
+  setStatusAsDownloading() {
+    isCurrentlyDownloading = true;
+    notifyListeners();
+  }
+
+  setStatusDownloadComplete() {
+    isCurrentlyDownloading = false;
+    notifyListeners();
+  }
+
+  setStatusAsExtracting() {
+    isExtracting = true;
+    notifyListeners();
+  }
+
+  setStatusExtractionComplete() {
+    isExtracting = false;
+    notifyListeners();
+  }
 
   setCurrentlyDownloading(_) {
     currentlyDownloading = _;
@@ -52,6 +86,16 @@ class InstallationProvider extends ChangeNotifier {
 
   setVisualStudioCodeAsIDE() {
     useVisualStudioCodeAsIDE = !useVisualStudioCodeAsIDE;
+    notifyListeners();
+  }
+
+  setAccountPassword(_) {
+    accountPassword = _;
+    notifyListeners();
+  }
+
+  void setIsInstalling(bool _) {
+    isInstalling = _;
     notifyListeners();
   }
 }

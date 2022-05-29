@@ -11,6 +11,7 @@ import 'package:dash_playground/utils/animated_progress_bar.dart';
 import 'package:dash_playground/utils/modifiers.dart';
 import 'package:dash_playground/utils/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -212,30 +213,76 @@ class _DashPlaygroundState extends State<DashPlayground> {
             .toString()
             .replaceAll(" MiB", "")) ??
         0;
-    systemImageSizes.forEach((element) {
+    for (var element in systemImageSizes) {
       provider.sizes[
               'systemImageSDK${(element as Map<String, dynamic>).entries.first.key}'] =
           int.tryParse(element.entries.first.value) ?? 0;
-    });
+    }
+    var flutterSDKURL =
+        'https://storage.googleapis.com/flutter_infra_release/releases/releases_${Platform.isMacOS ? "macos" : Platform.isWindows ? "windows" : "linux"}.json';
+    var flutterSDKURI = Uri.tryParse(flutterSDKURL);
+    if (flutterSDKURI == null) {
+      return;
+    }
+    http.get(flutterSDKURI).then((response) {
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        var baseURL = jsonResponse["base_url"];
+        List<dynamic> urls = jsonResponse["releases"];
+        var stableURLS = urls
+            .where((element) =>
+                element["channel"] == "stable" &&
+                element["dart_sdk_arch"] ==
+                    (platform == "macOS-silicon" ? "arm64" : "x64"))
+            .toList();
+        //get the latest
+        var stableURLMap = stableURLS.reduce((value, element) =>
+            (DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
+                        .parse(value["release_date"]))
+                    .isAfter(DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
+                        .parse(element["release_date"]))
+                ? value
+                : element);
+        var stableURL = "$baseURL/${stableURLMap["archive"]}";
+        var betaURLS = urls
+            .where((element) =>
+                element["channel"] == "beta" &&
+                element["dart_sdk_arch"] ==
+                    (platform == "macOS-silicon" ? "arm64" : "x64"))
+            .toList();
+        var betaURLMap = betaURLS.reduce((value, element) =>
+            (DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
+                        .parse(value["release_date"]))
+                    .isAfter(DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
+                        .parse(element["release_date"]))
+                ? value
+                : element);
+        var betaURL = "$baseURL/${betaURLMap["archive"]}";
+        var masterURL =
+            "https://github.com/flutter/flutter/archive/refs/heads/master.zip";
+        provider.urls['Flutter SDK (beta)'] = betaURL;
+        provider.urls['Flutter SDK (master)'] = masterURL;
+        provider.urls['Flutter SDK (stable)'] = stableURL;
+        uiProvider.updatePercentage(1.0);
 
-    uiProvider.updatePercentage(1.0);
+        Future.delayed(const Duration(seconds: 1), () {
+          provider.urls.entries
+              .map((e) => "${e.key} ($platform): ${e.value}")
+              .forEach((element) {
+            print(element);
+          });
+          // provider.sizes.entries
+          //     .map((e) => "${e.key} ($platform): ${e.value}")
+          //     .forEach((element) {
+          //   print(element);
+          // });
 
-    Future.delayed(const Duration(seconds: 1), () {
-      // provider.urls.entries
-      //     .map((e) => "${e.key} ($platform): ${e.value}")
-      //     .forEach((element) {
-      //   print(element);
-      // });
-      // provider.sizes.entries
-      //     .map((e) => "${e.key} ($platform): ${e.value}")
-      //     .forEach((element) {
-      //   print(element);
-      // });
-
-      Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
-        isLoaded = true;
-        setState(() {});
-      });
+          Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+            isLoaded = true;
+            setState(() {});
+          });
+        });
+      }
     });
   }
 

@@ -7,7 +7,6 @@ import 'package:dash_playground/utils/size_config.dart';
 import 'package:dash_playground/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -182,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                   )
-                : SizedBox(),
+                : const SizedBox(),
           ],
         ),
         body: Row(
@@ -309,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen>
                               ? const GetStartedScreen()
                               : index == 1
                                   ? const ReviewInstallationScreen()
-                                  : InstallationScreen();
+                                  : const InstallationScreen();
                         },
                         physics: const NeverScrollableScrollPhysics(),
                       )

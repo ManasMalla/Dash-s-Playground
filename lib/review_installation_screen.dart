@@ -327,7 +327,7 @@ class _ReviewInstallationScreenState extends State<ReviewInstallationScreen>
                   ),
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.only(right: 24),
+                      padding: const EdgeInsets.only(right: 24),
                       child: TextWidget(
                           "Android Studio's bin folder and OpenJDK's bin will be added to the PATH variable ${Platform.isWindows ? "in the System Environmental Variables" : "for your shell"}",
                           size: getProportionateHeight(16),
