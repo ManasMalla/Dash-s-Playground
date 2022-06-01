@@ -122,7 +122,8 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                               provider
                                                   .setFlutterChannel(_ ?? e);
                                             }),
-                                        TextWidget(e.name.capitalize()),
+                                        TextWidget(e.name.capitalize(),
+                                  size: getProportionateHeight(16),),
                                       ],
                                     ),
                                   ))
@@ -226,6 +227,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                                                 e.key,
                                                                 color:
                                                                     Colors.grey,
+                                  size: getProportionateHeight(16),
                                                               ),
                                                               TextWidget(
                                                                 e.value != 0
@@ -237,6 +239,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                                                 color: Colors
                                                                     .grey
                                                                     .shade600,
+                                  size: getProportionateHeight(16),
                                                               ),
                                                             ],
                                                           )
@@ -282,6 +285,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                                                 e.key,
                                                                 color:
                                                                     Colors.grey,
+                                  size: getProportionateHeight(16),
                                                               ),
                                                               TextWidget(
                                                                 e.value != 0
@@ -293,6 +297,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                                                 color: Colors
                                                                     .grey
                                                                     .shade600,
+                                  size: getProportionateHeight(16),
                                                               ),
                                                             ],
                                                           )
@@ -336,6 +341,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                                                 e.key,
                                                                 color:
                                                                     Colors.grey,
+                                  size: getProportionateHeight(16),
                                                               ),
                                                               TextWidget(
                                                                 e.value != 0
@@ -347,6 +353,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                                                 color: Colors
                                                                     .grey
                                                                     .shade600,
+                                  size: getProportionateHeight(16),
                                                               ),
                                                             ],
                                                           )

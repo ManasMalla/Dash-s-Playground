@@ -84,8 +84,8 @@ class _InstallationScreenState extends State<InstallationScreen>
         ? Platform.isMacOS
             ? "VSCode-darwin.zip"
             : Platform.isLinux
-                ? "code-stable-x64.tar.gz"
-                : "VSCode-win32-x64.zip"
+                ? "/Visual Studio Code/code-stable-x64.tar.gz"
+                : "/Visual Studio Code/VSCode-win32-x64.zip"
         : provider.flutterChannel == FlutterChannel.master
             ? "flutter-master.zip"
             : url?.split("/").last;
@@ -104,7 +104,7 @@ class _InstallationScreenState extends State<InstallationScreen>
         provider.setStatusAsExtracting();
         unarchiveAndSave(
           downloadedFile,
-          "${temporaryDirectory.path}/Dash's Playground",
+          "${temporaryDirectory.path}/Dash's Playground${entry.key.contains("Visual Studio Code") && Platform.isWindows ? "/Visual Studio Code" : ""}",
         );
       });
     }
@@ -157,9 +157,13 @@ class _InstallationScreenState extends State<InstallationScreen>
   }
 
   runCHMOD() {
-    Shell shell = Shell();
-    shell.run('chmod -R +x "${temporaryDirectory.path}/Dash\'s Playground"');
-    deleteZips();
+    if (!Platform.isWindows) {
+      Shell shell = Shell();
+      shell.run('chmod -R +x "${temporaryDirectory.path}/Dash\'s Playground"');
+      deleteZips();
+    } else {
+      deleteZips();
+    }
   }
 
   deleteZips() {
@@ -168,25 +172,40 @@ class _InstallationScreenState extends State<InstallationScreen>
       file.delete(recursive: true);
     }
 
-    getLibraryDirectory().then((value) {
-      value.exists().then((exits) {
-        moveFiles(exits ? value.path : "");
+    if (Platform.isMacOS) {
+      getLibraryDirectory().then((value) {
+        value.exists().then((exits) {
+          Shell shell1 = Shell(
+              workingDirectory: "${Platform.environment['LocalAppData']}");
+          shell1.run("mkdir Android").then((_) {
+            moveFiles(exits ? value.path : "");
+          });
+        });
       });
-    });
+    } else {
+      Shell shell1 =
+          Shell(workingDirectory: "${Platform.environment['LocalAppData']}");
+      shell1.run("mkdir Android").then((_) {
+        moveFiles("");
+      });
+    }
   }
 
   moveFiles(lib) {
+    var windowsHome = "${temporaryDirectory.path.split("AppData").first}";
     var directory = Directory("${temporaryDirectory.path}/Dash's Playground/");
     var files = directory.listSync(recursive: false);
     var paths = {};
     for (var element in files) {
-      if (element.path.contains("Android")) {
+      print(element.path);
+      if (element.path.contains("Android") ||
+          element.path.contains("android")) {
         paths["Android Studio"] = [
           element.path,
           Platform.isMacOS
               ? "/Applications"
               : Platform.isWindows
-                  ? "${Platform.environment['programfiles']}\Android"
+                  ? "${windowsHome}Android"
                   : "/usr/local/android-studio"
         ];
       } else if (element.path.contains("jdk")) {
@@ -195,7 +214,7 @@ class _InstallationScreenState extends State<InstallationScreen>
           Platform.isMacOS
               ? '$lib/Java/JavaVirtualMachines'
               : Platform.isWindows
-                  ? '${Platform.environment['ProgramFiles']}\Java'
+                  ? '${windowsHome}Java'
                   : '/usr/lib/jvm'
         ];
       } else if (element.path.contains("cmdline")) {
@@ -204,16 +223,17 @@ class _InstallationScreenState extends State<InstallationScreen>
           Platform.isMacOS
               ? '$lib/Android/sdk'
               : Platform.isWindows
-                  ? '${Platform.environment['LocalAppData']}\Android\sdk'
+                  ? '${Platform.environment['LocalAppData']}/Android/sdk'
                   : '/usr/lib/android-sdk'
         ];
-      } else if (element.path.contains("Visual Studio Code")) {
+      } else if (element.path.contains("Visual Studio Code") ||
+          element.path.contains("VisualStudioCode")) {
         paths["Visual Studio Code"] = [
           element.path,
           Platform.isMacOS
               ? "/Applications"
               : Platform.isWindows
-                  ? "${Platform.environment['programfiles']}\Visual Studio Code"
+                  ? "${windowsHome}"
                   : "/usr/local/visual-studio-code"
         ];
       } else if (element.path.contains("flutter")) {
@@ -222,7 +242,7 @@ class _InstallationScreenState extends State<InstallationScreen>
           Platform.isMacOS
               ? "$lib/Flutter-SDK/"
               : Platform.isWindows
-                  ? "${temporaryDirectory.path.split("AppData").first}Flutter-SDK"
+                  ? "${windowsHome}Flutter-SDK"
                   : "/usr/local/flutter-sdk"
         ];
       }
@@ -233,16 +253,42 @@ class _InstallationScreenState extends State<InstallationScreen>
       provider.setIsInstalling(true);
       print("$key $value");
       var shell = Shell();
+
       shell
           .run(
               '${Platform.isWindows ? 'move' : 'mv'} "${value[0]}" "${value[1]}"')
-          .then((value) {
+          .then((value) async {
         for (var element in value) {
           provider.setDownloadProgress(100);
           provider.setIsInstalling(false);
+          if (Platform.isWindows) {
+            if (key.toString().contains("Android")) {
+              await createShortcuts(
+                  "${windowsHome}Android/bin/studio64.exe", windowsHome, key);
+            } else {
+              if (key.toString().contains("Visual")) {
+                await createShortcuts(
+                    "${windowsHome}Visual Studio Code/Code.exe",
+                    windowsHome,
+                    key);
+              }
+            }
+          }
         }
       });
     });
+  }
+
+  createShortcuts(target, windowsHome, key) async {
+    Shell shell = Shell();
+    await shell.run('''   
+    \$strTargetPath = "$target"
+   \$strLinkFile = "${windowsHome}Desktop/${key == "AS" ? "Android Studio" : "Visual Studio Code"}.lnk"
+   \$WScriptShell = New-Object -ComObject WScript.Shell
+   \$Shortcut = \$WScriptShell.CreateShortcut(\$strLinkFile)
+   \$Shortcut.TargetPath = \$strTargetPath
+   \$Shortcut.Save()
+   ''');
   }
 
   @override
