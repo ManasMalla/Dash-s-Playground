@@ -27,9 +27,6 @@ class ThemeConfig {
       onBackground = const Color(0xFF01579b);
     }
     provider.addListener(() {
-      // themeMode = Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
-      // print(themeMode);
-      // background = (themeMode ? Color(0xFF121212) : Colors.grey.shade50);
       themeMode = provider.isDarkMode;
       if (provider.isDarkMode) {
         background = const Color(0xFF121212);

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dash_playground/controllers/splash_controller.dart';
 import 'package:dash_playground/home_screen.dart';
 import 'package:dash_playground/providers/installation_provider.dart';
 import 'package:dash_playground/utils/platform_extension.dart';
@@ -11,7 +12,9 @@ import 'package:dash_playground/utils/animated_progress_bar.dart';
 import 'package:dash_playground/utils/modifiers.dart';
 import 'package:dash_playground/utils/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -92,13 +95,20 @@ class DashPlayground extends StatefulWidget {
   const DashPlayground({Key? key}) : super(key: key);
 
   @override
-  State<DashPlayground> createState() => _DashPlaygroundState();
+  StateMVC<DashPlayground> createState() => _DashPlaygroundState();
 }
 
-class _DashPlaygroundState extends State<DashPlayground> {
+class _DashPlaygroundState extends StateMVC<DashPlayground> {
   var isLoaded = false;
   late InstallationProvider provider;
   late SplashScreenProvider uiProvider;
+
+  late SplashController splashController;
+
+  _DashPlaygroundState() : super(SplashController()) {
+    /// Acquire a reference to the passed Controller.
+    splashController = controller as SplashController;
+  }
 
   @override
   void initState() {
@@ -108,190 +118,17 @@ class _DashPlaygroundState extends State<DashPlayground> {
     uiProvider = Provider.of<SplashScreenProvider>(context, listen: false);
   }
 
-  fetchJSON(context) async {
-    var jsonUrl =
-        "https://raw.githubusercontent.com/ManasMalla/Dash-s-Playground/main/urls.json";
-    var jsonUri = Uri.tryParse(jsonUrl);
-    if (jsonUri == null) {
-      return;
-    }
-    final response = await http.get(jsonUri);
-    if (response.statusCode == 200) {
-      uiProvider.updatePercentage(0.1);
-      List<dynamic> values = json.decode(response.body)['urls'];
-      List<dynamic> desktopSizesList =
-          json.decode(response.body)['desktop-tools'];
-      List<dynamic> flutterSDKSizesList =
-          json.decode(response.body)['flutter-sdk'];
-      List<dynamic> emulatorSizesList =
-          json.decode(response.body)['emulator-size'];
-      var platform = Platform.isMacOS
-          ? "macOS"
-          : Platform.isWindows
-              ? "windows"
-              : Platform.isLinux
-                  ? "linux"
-                  : "";
-      if (Platform.isMacOS) {
-        Process.run('uname', ['-m']).then((result) {
-          if (!(result.stdout as String).contains("x86_64") &&
-              result.stdout != "") {
-            platform = "macOS-silicon";
-          }
-          fetchPlatformSpecificURL(platform, values, flutterSDKSizesList,
-              desktopSizesList, emulatorSizesList);
-        });
-      } else {
-        fetchPlatformSpecificURL(platform, values, flutterSDKSizesList,
-            desktopSizesList, emulatorSizesList);
-      }
-    }
-  }
-
-  fetchPlatformSpecificURL(platform, values, List<dynamic> flutterSDKSizes,
-      List<dynamic> desktopToolsSizes, List<dynamic> systemImageSizes) {
-    var androidStudioURls = values
-        .where(
-            (element) => element["name"].toString().contains("android-studio"))
-        .toList();
-    var androidStudioURL = (androidStudioURls[0]["urls"] as List<dynamic>)
-        .where((element) => element["platform"] == platform)
-        .toList();
-    provider.urls["Android Studio"] = androidStudioURL[0]["url"];
-
-    provider.setAndroidStudioCodename(androidStudioURls[0]["name"]
-        .toString()
-        .split("android-studio-")
-        .last
-        .capitalize());
-    provider.sizes["Android Studio"] = int.tryParse(
-            androidStudioURL[0]["size"].toString().replaceAll(" MiB", "")) ??
-        0;
-    uiProvider.updatePercentage(0.25);
-
-    var cmdLineToolsURls =
-        values.where((element) => element["name"] == "cmdline-tools").toList();
-    var cmdLineToolsURL = (cmdLineToolsURls[0]["urls"] as List<dynamic>)
-        .where((element) => element["platform"] == platform)
-        .toList();
-    provider.urls["Command Line Tools"] = cmdLineToolsURL[0]["url"];
-    provider.sizes["Command Line Tools"] = int.tryParse(
-            cmdLineToolsURL[0]["size"].toString().replaceAll(" MiB", "")) ??
-        0;
-    uiProvider.updatePercentage(0.4);
-
-    var openJDKURls =
-        values.where((element) => element["name"] == "openJDK").toList();
-    var openJDKURL = (openJDKURls[0]["urls"] as List<dynamic>)
-        .where((element) => element["platform"] == platform)
-        .toList();
-    provider.urls["OpenJDK"] = openJDKURL[0]["url"];
-    provider.sizes["OpenJDK"] =
-        int.tryParse(openJDKURL[0]["size"].toString().replaceAll(" MiB", "")) ??
-            0;
-    uiProvider.updatePercentage(0.6);
-
-    var visualStudioCodeURLS = values
-        .where((element) => element["name"] == "visual-studio-code")
-        .toList();
-    var visualStudioCodeUrl = (visualStudioCodeURLS[0]["urls"] as List<dynamic>)
-        .where((element) => element["platform"] == platform)
-        .toList();
-    provider.urls["Visual Studio Code"] = visualStudioCodeUrl[0]["url"];
-    provider.sizes["Visual Studio Code"] = int.tryParse(
-            visualStudioCodeUrl[0]["size"].toString().replaceAll(" MiB", "")) ??
-        0;
-    uiProvider.updatePercentage(0.8);
-
-    provider.sizes['Flutter SDK'] = int.tryParse(flutterSDKSizes
-            .firstWhere((element) => element["platform"] == platform)['size']
-            .toString()
-            .replaceAll(" MiB", "")) ??
-        0;
-    provider.sizes['desktop-tools'] = int.tryParse(desktopToolsSizes
-            .firstWhere((element) => element["platform"] == platform)['size']
-            .toString()
-            .replaceAll(" MiB", "")) ??
-        0;
-    for (var element in systemImageSizes) {
-      provider.sizes[
-              'systemImageSDK${(element as Map<String, dynamic>).entries.first.key}'] =
-          int.tryParse(element.entries.first.value) ?? 0;
-    }
-    var flutterSDKURL =
-        'https://storage.googleapis.com/flutter_infra_release/releases/releases_${Platform.isMacOS ? "macos" : Platform.isWindows ? "windows" : "linux"}.json';
-    var flutterSDKURI = Uri.tryParse(flutterSDKURL);
-    if (flutterSDKURI == null) {
-      return;
-    }
-    http.get(flutterSDKURI).then((response) {
-      if (response.statusCode == 200) {
-        var jsonResponse = json.decode(response.body);
-        var baseURL = jsonResponse["base_url"];
-        List<dynamic> urls = jsonResponse["releases"];
-        var stableURLS = urls
-            .where((element) =>
-                element["channel"] == "stable" &&
-                element["dart_sdk_arch"] ==
-                    (platform == "macOS-silicon" ? "arm64" : "x64"))
-            .toList();
-        //get the latest
-        var stableURLMap = stableURLS.reduce((value, element) =>
-            (DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
-                        .parse(value["release_date"]))
-                    .isAfter(DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
-                        .parse(element["release_date"]))
-                ? value
-                : element);
-        var stableURL = "$baseURL/${stableURLMap["archive"]}";
-        var betaURLS = urls
-            .where((element) =>
-                element["channel"] == "beta" &&
-                element["dart_sdk_arch"] ==
-                    (platform == "macOS-silicon" ? "arm64" : "x64"))
-            .toList();
-        var betaURLMap = betaURLS.reduce((value, element) =>
-            (DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
-                        .parse(value["release_date"]))
-                    .isAfter(DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
-                        .parse(element["release_date"]))
-                ? value
-                : element);
-        var betaURL = "$baseURL/${betaURLMap["archive"]}";
-        var masterURL =
-            "https://github.com/flutter/flutter/archive/refs/heads/master.zip";
-        provider.urls['Flutter SDK (beta)'] = betaURL;
-        provider.urls['Flutter SDK (master)'] = masterURL;
-        provider.urls['Flutter SDK (stable)'] = stableURL;
-        uiProvider.updatePercentage(1.0);
-
-        Future.delayed(const Duration(seconds: 1), () {
-          provider.urls.entries
-              .map((e) => "${e.key} ($platform): ${e.value}")
-              .forEach((element) {
-            print(element);
-          });
-          // provider.sizes.entries
-          //     .map((e) => "${e.key} ($platform): ${e.value}")
-          //     .forEach((element) {
-          //   print(element);
-          // });
-
-          Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
-            isLoaded = true;
-            setState(() {});
-          });
-        });
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     if (provider.urls.isEmpty &&
         platformCategory() != PlatformCategory.mobile) {
-      fetchJSON(context);
+      splashController.fetchJSON(uiProvider, provider, () {
+        Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+          isLoaded = true;
+          setState(() {});
+        });
+      });
     } else if (platformCategory() == PlatformCategory.mobile) {
       uiProvider.updatePercentage(1.0);
       Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {

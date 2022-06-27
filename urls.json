@@ -1,140 +1,130 @@
 {
-  "urls": [
+  "macOS": [
     {
       "name": "android-studio-chipmunk",
-      "urls": [
-        {
-          "platform": "macOS",
-          "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-mac.zip",
-          "size": "1017 MiB"
-        },
-        {
-          "platform": "macOS-silicon",
-          "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-mac_arm.zip",
-          "size": "1014 MiB"
-        },
-        {
-          "platform": "linux",
-          "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-linux.tar.gz",
-          "size": "964 MiB"
-        },
-        {
-          "platform": "windows",
-          "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-windows.zip",
-          "size": "940 MiB"
-        }
-      ]
+      "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-mac.zip",
+      "size": "1017 MiB"
     },
     {
       "name": "cmdline-tools",
-      "urls": [
-        {
-          "platform": "macOS",
-          "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip",
-          "size": "108 MiB"
-        },
-        {
-          "platform": "macOS-silicon",
-          "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip",
-          "size": "108 MiB"
-        },
-        {
-          "platform": "linux",
-          "url": "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip",
-          "size": "108 MiB"
-        },
-        {
-          "platform": "windows",
-          "url": "https://dl.google.com/android/repository/commandlinetools-win-8512546_latest.zip",
-          "size": "108 MiB"
-        }
-      ]
+      "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip",
+      "size": "108 MiB"
     },
     {
       "name": "openJDK",
-      "urls": [
-        {
-          "platform": "macOS",
-          "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-x64_bin.tar.gz",
-          "size": "177 MiB"
-        },
-        {
-          "platform": "macOS-silicon",
-          "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-aarch64_bin.tar.gz",
-          "size": "175 MiB"
-        },
-        {
-          "platform": "linux",
-          "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_linux-x64_bin.tar.gz",
-          "size": "180 MiB"
-        },
-        {
-          "platform": "windows",
-          "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_windows-x64_bin.zip",
-          "size": "179 MiB"
-        }
-      ]
+      "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-x64_bin.tar.gz",
+      "size": "177 MiB"
     },
     {
       "name": "visual-studio-code",
-      "urls": [
-        {
-          "platform": "macOS",
-          "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin",
-          "size": "104 MiB"
-        },
-        {
-          "platform": "macOS-silicon",
-          "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin-arm64",
-          "size": "103 MiB"
-        },
-        {
-          "platform": "linux",
-          "url": "https://code.visualstudio.com/sha/download?build=stable&os=linux-x64",
-          "size": "110 MiB"
-        },
-        {
-          "platform": "windows",
-          "url": "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-archive",
-          "size": "104 MiB"
-        }
-      ]
-    }
-  ],
-  "desktop-tools": [
+      "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin",
+      "size": "104 MiB"
+    },
     {
+      "name": "desktop-tools",
       "platform": "macOS",
       "size": "12600 MiB"
     },
     {
+      "name": "flutter-sdk",
+      "platform": "macOS",
+      "size": "1200 MiB"
+    }
+  ],
+  "macOS-Silicon": [
+    {
+      "name": "android-studio-chipmunk",
+      "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-mac_arm.zip",
+      "size": "1014 MiB"
+    },
+    {
+      "name": "cmdline-tools",
+      "url": "https://dl.google.com/android/repository/commandlinetools-mac-8512546_latest.zip",
+      "size": "108 MiB"
+    },
+    {
+      "name": "openJDK",
+      "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_macos-aarch64_bin.tar.gz",
+      "size": "175 MiB"
+    },
+    {
+      "name": "visual-studio-code",
+      "url": "https://code.visualstudio.com/sha/download?build=stable&os=darwin-arm64",
+      "size": "103 MiB"
+    },
+    {
+      "name": "desktop-tools",
       "platform": "macOS-silicon",
       "size": "12600 MiB"
     },
     {
+      "name": "flutter-sdk",
+      "platform": "macOS-silicon",
+      "size": "1200 MiB"
+    }
+  ],
+  "windows": [
+    {
+      "name": "android-studio-chipmunk",
+      "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-windows.zip",
+      "size": "940 MiB"
+    },
+    {
+      "name": "cmdline-tools",
+      "url": "https://dl.google.com/android/repository/commandlinetools-win-8512546_latest.zip",
+      "size": "108 MiB"
+    },
+    {
+      "name": "openJDK",
+      "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_windows-x64_bin.zip",
+      "size": "179 MiB"
+    },
+    {
+      "name": "visual-studio-code",
+      "url": "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-archive",
+      "size": "104 MiB"
+    },
+    {
+      "name": "desktop-tools",
+      "platform": "windows",
+      "size": "6370 MiB"
+    },
+    {
+      "name": "flutter-sdk",
+      "platform": "windows",
+      "size": "896 MiB"
+    }
+  ],
+  "linux": [
+    {
+      "name": "android-studio-chipmunk",
+      "url": "https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2021.2.1.15/android-studio-2021.2.1.15-linux.tar.gz",
+      "size": "964 MiB"
+    },
+    {
+      "name": "cmdline-tools",
+      "url": "https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip",
+      "size": "108 MiB"
+    },
+    {
+      "name": "openJDK",
+      "url": "https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_linux-x64_bin.tar.gz",
+      "size": "180 MiB"
+    },
+    {
+      "name": "visual-studio-code",
+      "url": "https://code.visualstudio.com/sha/download?build=stable&os=linux-x64",
+      "size": "110 MiB"
+    },
+    {
+      "name": "desktop-tools",
       "platform": "linux",
       "size": "500 MiB"
     },
     {
-      "platform": "windows",
-      "size": "6370 MiB"
-    }
-  ],
-  "flutter-sdk": [
-    {
-      "platform": "macOS",
-      "size": "1200 MiB"
-    },
-    {
-      "platform": "macOS-silicon",
-      "size": "1200 MiB"
-    },
-    {
+      "name": "flutter-sdk",
       "platform": "linux",
       "size": "598 MiB"
-    },
-    {
-      "platform": "windows",
-      "size": "896 MiB"
     }
   ],
   "emulator-size": [

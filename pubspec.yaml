@@ -41,6 +41,7 @@ dependencies:
   dio: ^4.0.6
   archive: ^3.3.0
   intl: ^0.17.0
+  mvc_pattern: ^8.10.2
 
 dev_dependencies:
   flutter_test:
