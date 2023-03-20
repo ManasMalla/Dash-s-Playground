@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:dash_playground/controllers/splash_controller.dart';
@@ -21,7 +20,9 @@ class DashPlayground extends StatefulWidget {
 }
 
 class _DashPlaygroundState extends StateMVC<DashPlayground> {
+  //The boolean status of the splash screen
   var isLoaded = false;
+
   late InstallationProvider provider;
   late SplashScreenProvider uiProvider;
 
@@ -43,15 +44,24 @@ class _DashPlaygroundState extends StateMVC<DashPlayground> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    if (provider.urls.isEmpty &&
-        platformCategory() != PlatformCategory.mobile) {
+
+    /**
+     * Triage - Decide whether if the user is on desktop or not and then workout the respective work
+     * Desktop: Fetch the urls of the various platform-specific dependencies and update the progress indicator based on the fetch status
+     * Mobile: Nothing much to do, so just fetch all the latest projects
+     * Web: Nothing much to do, so just fetch all the latest projects
+     */
+
+    if (platformCategory() != PlatformCategory.mobile) {
       splashController.fetchJSON(uiProvider, provider, () {
-        Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
-          isLoaded = true;
-          setState(() {});
-        });
+        //TODO handle the screen management
+
+        // Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+        //   isLoaded = true;
+        //   setState(() {});
+        // });
       });
-    } else if (platformCategory() == PlatformCategory.mobile) {
+    } else {
       uiProvider.updatePercentage(1.0);
       Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
         isLoaded = true;
@@ -121,9 +131,9 @@ class _DashPlaygroundState extends StateMVC<DashPlayground> {
               child: AnimatedProgressBar(
                 width: 0.6,
                 duration:
-                Platform.isMacOS || Platform.isLinux || Platform.isWindows
-                    ? const Duration(seconds: 1)
-                    : const Duration(seconds: 2),
+                    Platform.isMacOS || Platform.isLinux || Platform.isWindows
+                        ? const Duration(seconds: 1)
+                        : const Duration(seconds: 2),
               ),
             ),
             const Spacer(),

@@ -1,6 +1,6 @@
 
 import 'package:dash_playground/main.dart';
-import 'package:dash_playground/ui/SplashScreen.dart';
+import 'package:dash_playground/ui/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../home_screen.dart';
