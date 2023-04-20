@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dash_playground/get_started_screen.dart';
+import 'package:dash_playground/utils/flutter_channel_enum.dart';
 import 'package:flutter/material.dart';
 
 class InstallationProvider extends ChangeNotifier {

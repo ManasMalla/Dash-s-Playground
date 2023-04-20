@@ -1,6 +1,6 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:dash_playground/providers/installation_provider.dart';
 import 'package:dash_playground/providers/splash_screen_provider.dart';
@@ -24,6 +24,7 @@ class SplashController extends ControllerMVC {
     get(jsonUri).then((Response response) {
       if (response.statusCode == 200) {
         uiProvider.updatePercentage(0.1);
+        uiProvider.updateNetworkAvailability();
         Map<String, dynamic> decodedJson = jsonDecode(response.body);
 
         Map<int, int> emulatorSizesList = {
@@ -46,14 +47,13 @@ class SplashController extends ControllerMVC {
                   });
         });
       } else {
-        //TODO Handle the failure
-
+        //Fetch Data from local JSON when the fetching of data from GitHub fails
         fetchDummyURLS(uiProvider, provider).then((value) => {
               if (value == ResponseStatus.success) {onCompletedCallback()}
             });
       }
-    }).timeout(const Duration(minutes: 1), onTimeout: () {
-      //TODO Handle the time out failure or either due to GitHub failing to provide the JSON Network
+    }).timeout(const Duration(seconds: 10), onTimeout: () {
+      //Fetch the data from local JSON when time out failure occurrs or GitHub failing to provide the JSON due to network
 
       fetchDummyURLS(uiProvider, provider).then((value) => {
             if (value == ResponseStatus.success) {onCompletedCallback()}
@@ -161,7 +161,7 @@ class SplashController extends ControllerMVC {
       provider.urls.entries
           .map((e) => "${e.key} ($platform): ${e.value}")
           .forEach((element) {
-        print(element);
+        log(element);
       });
     });
 

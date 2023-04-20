@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 
-class SizeConfig {
-  static late double heightRatio;
-  static late double widthRatio;
-  init(context) {
-    var mediaQueryData = MediaQuery.of(context);
-    var size = mediaQueryData.size;
-    heightRatio = size.height / 694;
-    widthRatio = size.width / 1251;
-  }
-}
+enum WindowWidthSizeClass { compact, medium, exanded }
 
-double getProportionateHeight(double height) {
-  return height * SizeConfig.heightRatio;
-}
-
-double getProportionateWidth(double width) {
-  return width * SizeConfig.widthRatio;
+WindowWidthSizeClass getWindowWidthSizeClass(BoxConstraints constraints) {
+  return constraints.maxWidth <= 600
+      ? WindowWidthSizeClass.compact
+      : constraints.maxWidth <= 840
+          ? WindowWidthSizeClass.medium
+          : WindowWidthSizeClass.exanded;
 }

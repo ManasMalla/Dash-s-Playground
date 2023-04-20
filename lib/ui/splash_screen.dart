@@ -1,34 +1,26 @@
-import 'dart:io';
-
 import 'package:dash_playground/controllers/splash_controller.dart';
 import 'package:dash_playground/providers/installation_provider.dart';
 import 'package:dash_playground/providers/splash_screen_provider.dart';
+import 'package:dash_playground/utils/animated_visibility.dart';
 import 'package:dash_playground/utils/platform_extension.dart';
 import 'package:dash_playground/utils/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:provider/provider.dart';
 
-import '../utils/animated_progress_bar.dart';
-import '../utils/modifiers.dart';
-
-class DashPlayground extends StatefulWidget {
-  const DashPlayground({Key? key}) : super(key: key);
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  StateMVC<DashPlayground> createState() => _DashPlaygroundState();
+  StateMVC<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _DashPlaygroundState extends StateMVC<DashPlayground> {
-  //The boolean status of the splash screen
-  var isLoaded = false;
-
-  late InstallationProvider provider;
-  late SplashScreenProvider uiProvider;
+class _SplashScreenState extends StateMVC<SplashScreen> {
+  late SplashScreenProvider _uiProvider;
 
   late SplashController splashController;
 
-  _DashPlaygroundState() : super(SplashController()) {
+  _SplashScreenState() : super(SplashController()) {
     /// Acquire a reference to the passed Controller.
     splashController = controller as SplashController;
   }
@@ -36,15 +28,11 @@ class _DashPlaygroundState extends StateMVC<DashPlayground> {
   @override
   void initState() {
     super.initState();
-    provider = Provider.of<InstallationProvider>(context, listen: false);
-
-    uiProvider = Provider.of<SplashScreenProvider>(context, listen: false);
+    _uiProvider = Provider.of<SplashScreenProvider>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-
     /**
      * Triage - Decide whether if the user is on desktop or not and then workout the respective work
      * Desktop: Fetch the urls of the various platform-specific dependencies and update the progress indicator based on the fetch status
@@ -53,117 +41,91 @@ class _DashPlaygroundState extends StateMVC<DashPlayground> {
      */
 
     if (platformCategory() != PlatformCategory.mobile) {
-      splashController.fetchJSON(uiProvider, provider, () {
-        //TODO handle the screen management
-
-        // Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
-        //   isLoaded = true;
-        //   setState(() {});
-        // });
+      InstallationProvider provider =
+          Provider.of<InstallationProvider>(context, listen: false);
+      splashController.fetchJSON(_uiProvider, provider, () {
+        _uiProvider.updateNetworkAvailability();
+        _uiProvider.updateLoadedState();
       });
     } else {
-      uiProvider.updatePercentage(1.0);
+      _uiProvider.updatePercentage(1.0);
       Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
-        isLoaded = true;
-        setState(() {});
+        _uiProvider.updateNetworkAvailability();
+        _uiProvider.updateLoadedState();
       });
     }
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/images/splash_screen.png'),
-              fit: BoxFit.cover),
-        ),
-        child: Column(
-          children: [
-            SizedBox(
-              height: getProportionateHeight(32),
-            ),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/title_ribbon.png',
-                  width: Modifier.fillMaxHeight(0.8),
-                ),
-                Column(
-                  children: [
-                    SizedBox(
-                      height: getProportionateHeight(12),
-                    ),
-                    SizedBox(
-                      height: getProportionateHeight(36),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'DASH\'S ',
-                            style: TextStyle(
-                              fontFamily: 'Childish Reverie',
-                              fontSize: getProportionateHeight(48),
-                              color: const Color(0xFF54c5f8),
-                            ),
+    return Consumer<SplashScreenProvider>(builder: (context, uiProvider, _) {
+      return LayoutBuilder(builder: (context, constraints) {
+        WindowWidthSizeClass widthSizeClass =
+            getWindowWidthSizeClass(constraints);
+        return Scaffold(
+          body: Row(
+            children: [
+              Flexible(
+                flex: 2,
+                child: Padding(
+                  padding: EdgeInsets.all(
+                      widthSizeClass == WindowWidthSizeClass.compact ? 24 : 48),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Spacer(),
+                        const Icon(
+                          Icons.flutter_dash_rounded,
+                          size: 64,
+                        ),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                        Text(
+                          "Dash's Playgrounds",
+                          style: Theme.of(context).textTheme.displayMedium,
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        AnimatedVisibility(
+                          visible: !_uiProvider.isLoaded,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: uiProvider.hasNetworkAvailable
+                                ? LinearProgressIndicator(
+                                    value: uiProvider.percentage)
+                                : const LinearProgressIndicator(),
                           ),
-                          Text(
-                            ' PLAYGROUND',
-                            style: TextStyle(
-                              fontFamily: 'Childish Reverie',
-                              fontSize: getProportionateHeight(48),
-                              color: const Color(0xFF01579b),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-            SizedBox(
-              height: getProportionateHeight(8),
-            ),
-            AnimatedOpacity(
-              opacity: isLoaded ? 0 : 1,
-              duration: const Duration(milliseconds: 300),
-              child: AnimatedProgressBar(
-                width: 0.6,
-                duration:
-                    Platform.isMacOS || Platform.isLinux || Platform.isWindows
-                        ? const Duration(seconds: 1)
-                        : const Duration(seconds: 2),
-              ),
-            ),
-            const Spacer(),
-            AnimatedOpacity(
-              opacity: isLoaded ? 1 : 0,
-              duration: const Duration(milliseconds: 300),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: MaterialButton(
-                  onPressed: () {
-                    Navigator.of(context).popAndPushNamed('home-screen');
-                  },
-                  elevation: 0,
-                  height: getProportionateHeight(64),
-                  color: Colors.amber,
-                  shape: const CircleBorder(),
-                  child: Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.white,
-                    size: getProportionateHeight(20),
-                  ),
+                        ),
+                        const Spacer(),
+                        AnimatedVisibility(
+                            visible: uiProvider.isLoaded,
+                            child: FilledButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pushNamed('home-screen');
+                                },
+                                child: const Text("Continue")))
+                      ]),
                 ),
               ),
-            ),
-            SizedBox(
-              height: getProportionateHeight(16),
-            )
-          ],
-        ),
-      ),
-    );
+              Expanded(
+                flex: 3,
+                child: Image.asset(
+                  "assets/images/splash_screen.png",
+                  fit: BoxFit.cover,
+                  height: double.infinity,
+                ),
+              )
+            ],
+          ),
+        );
+      });
+    });
   }
 }

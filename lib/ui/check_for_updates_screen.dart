@@ -1,8 +1,5 @@
 import 'dart:io';
 
-import 'package:dash_playground/utils/size_config.dart';
-import 'package:dash_playground/utils/text_widget.dart';
-import 'package:dash_playground/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:process_run/shell.dart';
 
@@ -19,6 +16,7 @@ class _CheckForUpdatesScreenState extends State<CheckForUpdatesScreen> {
   var sdkUrl = "";
   var flutterSdkUrl = "";
   var flutterVersion = "";
+  var isStatusReady = false;
 
   var updateSDKButtonState = false;
   var updateFlutterSDKButtonState = false;
@@ -98,6 +96,7 @@ class _CheckForUpdatesScreenState extends State<CheckForUpdatesScreen> {
     shell.run("flutter upgrade --verify-only").then((value) {
       isFlutterSDKUpToDate =
           value.outText.contains("Flutter is already up to date on channel");
+      isStatusReady = true;
       setState(() {});
     });
   }
@@ -117,50 +116,43 @@ class _CheckForUpdatesScreenState extends State<CheckForUpdatesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextWidget(
+          Text(
             "Flutter SDK Location",
-            color: ThemeConfig.primary,
-            size: getProportionateHeight(24),
-            weight: FontWeight.w500,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-          SizedBox(
-            height: getProportionateHeight(8),
+          const SizedBox(
+            height: 8,
           ),
-          TextWidget(
+          Text(
             flutterVersion,
-            color: ThemeConfig.primary.withOpacity(0.6),
-            size: getProportionateHeight(20),
-            weight: FontWeight.w500,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           Row(
             children: [
               updateFlutterSDKButtonState
                   ? Expanded(
                       child: TextField(
-                        cursorColor: ThemeConfig.primary,
                         decoration: InputDecoration(
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: ThemeConfig.primary, width: 2),
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2),
                           ),
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: ThemeConfig.primary, width: 2),
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2),
                           ),
                         ),
                         controller: flutterSdkUrlController,
-                        style: TextStyle(
-                            fontFamily: 'Product Sans',
-                            fontSize: getProportionateHeight(18)),
                       ),
                     )
-                  : TextWidget(
+                  : Text(
                       flutterSdkUrl,
-                      size: getProportionateHeight(18),
                     ),
               updateFlutterSDKButtonState
-                  ? SizedBox(
-                      width: getProportionateWidth(42),
+                  ? const SizedBox(
+                      width: 42,
                     )
                   : const Spacer(),
               TextButton(
@@ -172,61 +164,52 @@ class _CheckForUpdatesScreenState extends State<CheckForUpdatesScreen> {
                   updateFlutterSDKButtonState = !updateFlutterSDKButtonState;
                   setState(() {});
                 },
-                child: TextWidget(
+                child: Text(
                   updateFlutterSDKButtonState ? "Update" : "Change",
-                  size: getProportionateHeight(18),
-                  weight: FontWeight.w500,
-                  color: ThemeConfig.themeMode
-                      ? Colors.blue.shade400
-                      : Colors.blue.shade700,
                 ),
               ),
-              SizedBox(
-                width: getProportionateWidth(42),
+              const SizedBox(
+                width: 42,
               )
             ],
           ),
-          SizedBox(
-            height: getProportionateHeight(12),
+          const SizedBox(
+            height: 12,
           ),
-          TextWidget(
+          Text(
             "Android SDK Location",
-            color: ThemeConfig.primary,
-            size: getProportionateHeight(24),
-            weight: FontWeight.w500,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-          SizedBox(
-            height: getProportionateHeight(8),
+          const SizedBox(
+            height: 8,
           ),
           Row(
             children: [
               updateSDKButtonState
                   ? Expanded(
                       child: TextField(
-                        cursorColor: ThemeConfig.primary,
+                        cursorColor: Theme.of(context).colorScheme.primary,
                         decoration: InputDecoration(
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: ThemeConfig.primary, width: 2),
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2),
                           ),
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: ThemeConfig.primary, width: 2),
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2),
                           ),
                         ),
                         controller: sdkUrlController,
-                        style: TextStyle(
-                            fontFamily: 'Product Sans',
-                            fontSize: getProportionateHeight(18)),
                       ),
                     )
-                  : TextWidget(
+                  : Text(
                       sdkUrl,
-                      size: getProportionateHeight(18),
                     ),
               updateSDKButtonState
-                  ? SizedBox(
-                      width: getProportionateWidth(42),
+                  ? const SizedBox(
+                      width: 42,
                     )
                   : const Spacer(),
               TextButton(
@@ -238,76 +221,74 @@ class _CheckForUpdatesScreenState extends State<CheckForUpdatesScreen> {
                   updateSDKButtonState = !updateSDKButtonState;
                   setState(() {});
                 },
-                child: TextWidget(
+                child: Text(
                   updateSDKButtonState ? "Update" : "Change",
-                  size: getProportionateHeight(18),
-                  weight: FontWeight.w500,
-                  color: ThemeConfig.themeMode
-                      ? Colors.blue.shade400
-                      : Colors.blue.shade700,
                 ),
               ),
-              SizedBox(
-                width: getProportionateWidth(42),
+              const SizedBox(
+                width: 42,
               )
             ],
           ),
           const Spacer(),
-          isFlutterSDKUpToDate
-              ? SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/images/verified.png",
-                        height: getProportionateHeight(100),
+          AnimatedSwitcher(
+            duration: Duration(milliseconds: 300),
+            child: !isStatusReady
+                ? Center(child: CircularProgressIndicator())
+                : isFlutterSDKUpToDate
+                    ? SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/verified.png",
+                              height: 100,
+                            ),
+                            const SizedBox(
+                              height: 24,
+                            ),
+                            Text(
+                              "You're all up-to-date!",
+                              style: Theme.of(context).textTheme.displaySmall,
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ],
+                        ),
+                      )
+                    : SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/update_available.png",
+                              height: 100,
+                            ),
+                            const SizedBox(
+                              height: 24,
+                            ),
+                            Text(
+                              "Update Available",
+                              style: Theme.of(context).textTheme.displaySmall,
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(
-                        height: getProportionateHeight(24),
-                      ),
-                      TextWidget(
-                        "You're all up-to-date!",
-                        color: ThemeConfig.primary,
-                        size: getProportionateHeight(36),
-                        weight: FontWeight.w700,
-                      ),
-                      TextWidget(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                        color: ThemeConfig.primary.withOpacity(0.8),
-                        size: getProportionateHeight(20),
-                        weight: FontWeight.w500,
-                      ),
-                    ],
-                  ),
-                )
-              : SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/images/update_available.png",
-                        height: getProportionateHeight(100),
-                      ),
-                      SizedBox(
-                        height: getProportionateHeight(24),
-                      ),
-                      TextWidget(
-                        "Update Available",
-                        color: ThemeConfig.primary,
-                        size: getProportionateHeight(36),
-                        weight: FontWeight.w700,
-                      ),
-                      TextWidget(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                        color: ThemeConfig.primary.withOpacity(0.8),
-                        size: getProportionateHeight(20),
-                        weight: FontWeight.w500,
-                      ),
-                    ],
-                  ),
-                ),
+          ),
           const Spacer(),
         ],
       ),

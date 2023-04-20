@@ -1,6 +1,4 @@
 import 'package:dash_playground/utils/size_config.dart';
-import 'package:dash_playground/utils/text_widget.dart';
-import 'package:dash_playground/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 
 class AboutScreen extends StatefulWidget {
@@ -29,51 +27,42 @@ class _AboutScreenState extends State<AboutScreen> {
                 "Dash's",
                 style: TextStyle(
                   fontFamily: 'Childish Reverie',
-                  fontSize: getProportionateHeight(24),
-                  color: ThemeConfig.primary,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 36,
                 ),
               ),
               Text(
                 "Playground",
                 style: TextStyle(
                   fontFamily: 'Childish Reverie',
-                  fontSize: getProportionateHeight(48),
-                  color: ThemeConfig.primary,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 64,
                 ),
               ),
-              TextWidget(
+              const Text(
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque consectetur, dui non congue pretium, elit dui venenatis metus, convallis maximus nibh elit sit amet sapien. Curabitur vel enim nec augue hendrerit finibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Quisque ac augue vel augue cursus ornare. Curabitur euismod ac diam eu venenatis.\n\nIn egestas porttitor egestas. Etiam gravida hendrerit magna. Mauris hendrerit blandit viverra. Aliquam laoreet scelerisque imperdiet. Nullam dictum nisi nulla, eget elementum tellus tempor eu. \n\nSuspendisse tellus justo, dignissim id imperdiet ut, ornare at tellus. Suspendisse mattis augue urna, sit amet luctus lacus sodales sed. Proin at lacus nisl. Pellentesque porta, nisi sed pellentesque fringilla, purus urna consequat nisl, a rutrum neque ex id mauris. Suspendisse potenti. Aliquam bibendum eget tortor a fringilla.",
-                size: getProportionateHeight(18),
-                color: ThemeConfig.onBackground
-                    .withOpacity(ThemeConfig.themeMode ? 0.6 : 1),
               ),
               SizedBox(
-                height: getProportionateHeight(20),
+                height: 24,
               ),
-              TextWidget(
+              Text(
                 "Credits",
-                weight: FontWeight.bold,
-                size: getProportionateHeight(20),
-                color: ThemeConfig.onBackground,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               SizedBox(
-                height: getProportionateHeight(8),
+                height: 8,
               ),
               Row(
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextWidget(
+                      Text(
                         "The Flutter Team",
-                        weight: FontWeight.w500,
-                        size: getProportionateHeight(20),
-                        color: ThemeConfig.primary,
+                        style: Theme.of(context).textTheme.labelLarge,
                       ),
-                      TextWidget(
+                      Text(
                         "Flutter SDK and Documentation",
-                        size: getProportionateHeight(18),
-                        color: ThemeConfig.onBackground.withOpacity(0.8),
                       ),
                     ],
                   ),
@@ -81,32 +70,28 @@ class _AboutScreenState extends State<AboutScreen> {
                   ClipOval(
                     child: Image.asset(
                       'assets/images/flutter.jpg',
-                      height: getProportionateHeight(48),
+                      height: 48,
                     ),
                   ),
                   SizedBox(
-                    width: getProportionateWidth(96),
+                    width: 96,
                   ),
                 ],
               ),
               SizedBox(
-                height: getProportionateHeight(16),
+                height: 16,
               ),
               Row(
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextWidget(
+                      Text(
                         "Sampath Balavida",
-                        weight: FontWeight.w500,
-                        size: getProportionateHeight(20),
-                        color: ThemeConfig.primary,
+                        style: Theme.of(context).textTheme.labelLarge,
                       ),
-                      TextWidget(
+                      Text(
                         "The Windows Plugin interface",
-                        size: getProportionateHeight(18),
-                        color: ThemeConfig.onBackground.withOpacity(0.8),
                       ),
                     ],
                   ),
@@ -114,48 +99,41 @@ class _AboutScreenState extends State<AboutScreen> {
                   ClipOval(
                     child: Image.network(
                       'https://avatars.githubusercontent.com/u/26628788?v=4',
-                      height: getProportionateHeight(48),
+                      height: 48,
                     ),
                   ),
                   SizedBox(
-                    width: getProportionateWidth(96),
+                    width: 96,
                   ),
                 ],
               ),
               SizedBox(
-                height: getProportionateHeight(32),
+                height: 32,
               ),
               Align(
                 alignment: Alignment.center,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.network(
-                      "https://avatars.githubusercontent.com/u/38750492?v=4",
-                      height: getProportionateHeight(48),
+                    ClipOval(
+                      child: Image.network(
+                        "https://media.licdn.com/dms/image/D5603AQFYsCJRGlxWqQ/profile-displayphoto-shrink_400_400/0/1678267583894?e=1684972800&v=beta&t=t-MqdpH-RwkXyB9kadqcGVrcJlY6YTxbqzRUlAI2DmI",
+                        height: 48,
+                      ),
                     ),
                     SizedBox(
-                      width: getProportionateWidth(24),
+                      width: 24,
                     ),
                     SizedBox(
-                      height: getProportionateHeight(52),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Developed By  ",
-                            style: TextStyle(
-                              fontFamily: 'Childish Reverie',
-                              fontSize: getProportionateHeight(20),
-                              color: ThemeConfig.onBackground.withOpacity(0.6),
-                            ),
                           ),
                           Text(
                             "Manas Malla ©",
-                            style: TextStyle(
-                              fontFamily: 'Childish Reverie',
-                              fontSize: getProportionateHeight(32),
-                              color: ThemeConfig.onBackground,
-                            ),
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
                         ],
                       ),
