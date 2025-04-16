@@ -1,13 +1,10 @@
 import 'dart:io';
-
-import 'package:dash_playground/get_started_screen.dart';
 import 'package:flutter/material.dart';
 
-class InstallationProvider extends ChangeNotifier {
-  Map<String, String> urls = {};
-  Map<String, int> sizes = {};
+enum FlutterChannel { stable, beta, master }
 
-  FlutterChannel flutterChannel = FlutterChannel.stable;
+class InstallationProvider extends ChangeNotifier {
+ 
   bool deployEmulator = false;
   int emulatorAPI = 33;
   bool useVisualStudioCodeAsIDE = false;
@@ -59,15 +56,6 @@ class InstallationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  setAndroidStudioCodename(_) {
-    androidStudioCodename = _;
-    notifyListeners();
-  }
-
-  setFlutterChannel(FlutterChannel _) {
-    flutterChannel = _;
-    notifyListeners();
-  }
 
   setShouldDeployEmulator() {
     deployEmulator = !deployEmulator;
