@@ -78,47 +78,146 @@ class GettingStartedScreen extends StatelessWidget {
                     ),
                   );
                 }
-                final dependencies = (snapshot.data as List<Dependency>).map(
-                  (e) {
-                    return DependencyWithInstallChoice(
-                        dependency: e,
-                        isSelected: e.name.contains("Flutter SDK")
-                            ? e.version == FlutterChannel.stable.name
-                            : true);
-                  },
-                ).toList();
+                // Dependencies without Flutter.
+                // Ps. Need to add them at a later stage
+                final _dependencies =
+                    List<Dependency>.from(snapshot.data ?? []);
+                final _flutterDependencies = List<FlutterDependency>.from(
+                    _dependencies
+                        .where((e) => e.runtimeType == FlutterDependency));
+                final dependencies = _dependencies
+                    .map(
+                      (e) {
+                        return DependencyWithInstallChoice(
+                            dependency: e, isSelected: true);
+                      },
+                    )
+                    .where((e) => !e.dependency.name.contains("Flutter SDK"))
+                    .toList();
+                final flutterDependency = DependencyWithInstallChoice(
+                    dependency: _dependencies
+                        .where((e) => e.name.contains("Flutter SDK"))
+                        .first,
+                    isSelected: true);
+
+                FlutterChannel chosenFlutterChannel = FlutterChannel.stable;
+
                 return StatefulBuilder(builder: (context, setState) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
+                        Column(
+                          children: [
+                            CupertinoListTile(
+                              leading: MacosCheckbox(
+                                  value: flutterDependency.isSelected,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      flutterDependency.isSelected = value;
+                                    });
+                                  }),
+                              title: Text(
+                                "Flutter SDK",
+                                style:
+                                    MacosTheme.of(context).typography.headline,
+                              ),
+                              trailing: Text(
+                                flutterDependency.dependency.size.toString() +
+                                    " MiB",
+                                style:
+                                    MacosTheme.of(context).typography.footnote,
+                              ),
+                            ),
+                            flutterDependency.isSelected
+                                ? Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 0, bottom: 12, left: 72),
+                                    child: Row(
+                                      children: [
+                                        MacosRadioButton(
+                                          value: FlutterChannel.stable,
+                                          groupValue: chosenFlutterChannel,
+                                          onChanged: (value) {
+                                            chosenFlutterChannel =
+                                                FlutterChannel.stable;
+                                            setState(
+                                              () {},
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          "Stable (${_flutterDependencies.where((e) => e.channel == FlutterChannel.stable).first.version})",
+                                          style: MacosTheme.of(context)
+                                              .typography
+                                              .subheadline,
+                                        ),
+                                        const SizedBox(
+                                          width: 24,
+                                        ),
+                                        MacosRadioButton(
+                                          value: FlutterChannel.beta,
+                                          groupValue: chosenFlutterChannel,
+                                          onChanged: (value) {
+                                            chosenFlutterChannel =
+                                                FlutterChannel.beta;
+                                            setState(
+                                              () {},
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          "Beta (${_flutterDependencies.where((e) => e.channel == FlutterChannel.beta).first.version})",
+                                          style: MacosTheme.of(context)
+                                              .typography
+                                              .subheadline,
+                                        ),
+                                        const SizedBox(
+                                          width: 24,
+                                        ),
+                                        MacosRadioButton(
+                                          value: FlutterChannel.master,
+                                          groupValue: chosenFlutterChannel,
+                                          onChanged: (value) {
+                                            chosenFlutterChannel =
+                                                FlutterChannel.master;
+                                            setState(
+                                              () {},
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          "Master (${_flutterDependencies.where((e) => e.channel == FlutterChannel.master).first.version})",
+                                          style: MacosTheme.of(context)
+                                              .typography
+                                              .subheadline,
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            const MacosPulldownMenuDivider()
+                          ],
+                        ),
                         ListView.builder(
                           primary: false,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             var dependency = dependencies[index];
-                            if (dependency.dependency.name
-                                    .contains("Flutter SDK") &&
-                                dependency.dependency.version != "stable") {
-                              return const SizedBox();
-                            }
-                            String? chosenFlutterChannel = dependencies
-                                .where((element) =>
-                                    element.dependency.name
-                                        .contains("Flutter SDK") &&
-                                    element.isSelected)
-                                .firstOrNull
-                                ?.dependency
-                                .version;
                             return Column(
                               children: [
                                 CupertinoListTile(
                                   leading: MacosCheckbox(
-                                      value: dependency.isSelected ||
-                                          (dependency.dependency.name
-                                                  .contains("Flutter")
-                                              ? chosenFlutterChannel != null
-                                              : false),
+                                      value: dependency.isSelected,
                                       onChanged: (value) {
                                         setState(() {
                                           dependency.isSelected = value;
@@ -153,120 +252,6 @@ class GettingStartedScreen extends StatelessWidget {
                                         .footnote,
                                   ),
                                 ),
-                                dependency.dependency.name
-                                            .contains("Flutter SDK") &&
-                                        (chosenFlutterChannel != null)
-                                    ? Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 0, bottom: 12, left: 72),
-                                        child: Row(
-                                          children: [
-                                            MacosRadioButton(
-                                              value: FlutterChannel.stable.name,
-                                              groupValue: chosenFlutterChannel,
-                                              onChanged: (value) {
-                                                dependencies
-                                                    .where((dep) => dep
-                                                        .dependency.name
-                                                        .contains(
-                                                            "Flutter SDK"))
-                                                    .forEach((element) {
-                                                  if (element
-                                                          .dependency.version ==
-                                                      "stable") {
-                                                    element.isSelected = true;
-                                                  } else {
-                                                    element.isSelected = false;
-                                                  }
-                                                });
-                                                setState(
-                                                  () {},
-                                                );
-                                              },
-                                            ),
-                                            const SizedBox(
-                                              width: 8,
-                                            ),
-                                            Text(
-                                              "Stable",
-                                              style: MacosTheme.of(context)
-                                                  .typography
-                                                  .subheadline,
-                                            ),
-                                            const SizedBox(
-                                              width: 24,
-                                            ),
-                                            MacosRadioButton(
-                                              value: FlutterChannel.beta.name,
-                                              groupValue: chosenFlutterChannel,
-                                              onChanged: (value) {
-                                                dependencies
-                                                    .where((dep) => dep
-                                                        .dependency.name
-                                                        .contains(
-                                                            "Flutter SDK"))
-                                                    .forEach((element) {
-                                                  if (element
-                                                          .dependency.version ==
-                                                      "beta") {
-                                                    element.isSelected = true;
-                                                  } else {
-                                                    element.isSelected = false;
-                                                  }
-                                                });
-                                                setState(
-                                                  () {},
-                                                );
-                                              },
-                                            ),
-                                            const SizedBox(
-                                              width: 8,
-                                            ),
-                                            Text(
-                                              "Beta",
-                                              style: MacosTheme.of(context)
-                                                  .typography
-                                                  .subheadline,
-                                            ),
-                                            const SizedBox(
-                                              width: 24,
-                                            ),
-                                            MacosRadioButton(
-                                              value: FlutterChannel.master.name,
-                                              groupValue: chosenFlutterChannel,
-                                              onChanged: (value) {
-                                                dependencies
-                                                    .where((dep) => dep
-                                                        .dependency.name
-                                                        .contains(
-                                                            "Flutter SDK"))
-                                                    .forEach((element) {
-                                                  if (element
-                                                          .dependency.version ==
-                                                      "master") {
-                                                    element.isSelected = true;
-                                                  } else {
-                                                    element.isSelected = false;
-                                                  }
-                                                });
-                                                setState(
-                                                  () {},
-                                                );
-                                              },
-                                            ),
-                                            const SizedBox(
-                                              width: 8,
-                                            ),
-                                            Text(
-                                              "Master",
-                                              style: MacosTheme.of(context)
-                                                  .typography
-                                                  .subheadline,
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : const SizedBox(),
                                 index == dependencies.length - 1
                                     ? const SizedBox()
                                     : const MacosPulldownMenuDivider()
@@ -285,6 +270,16 @@ class GettingStartedScreen extends StatelessWidget {
                             showMacosAlertDialog(
                                 context: context,
                                 builder: (context) {
+                                  final finalDependencies = [
+                                    ...dependencies,
+                                    DependencyWithInstallChoice(
+                                        dependency: _flutterDependencies
+                                            .firstWhere((e) =>
+                                                e.channel ==
+                                                chosenFlutterChannel),
+                                        isSelected:
+                                            flutterDependency.isSelected)
+                                  ];
                                   return MacosAlertDialog(
                                     appIcon: const MacosIcon(
                                       CupertinoIcons.exclamationmark_triangle,
@@ -292,7 +287,7 @@ class GettingStartedScreen extends StatelessWidget {
                                     ),
                                     title: const Text("Confirmation"),
                                     message: Builder(builder: (context) {
-                                      final downloadSize = dependencies
+                                      final downloadSize = finalDependencies
                                           .where((dep) => dep.isSelected)
                                           .fold(
                                               0,

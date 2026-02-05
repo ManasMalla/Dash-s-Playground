@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:dash_playground/providers/installation_provider.dart';
 import 'package:dash_playground/utils/platform_extension.dart';
 import 'package:http/http.dart';
-import 'package:intl/intl.dart';
 
 class Dependency {
   final String name;
@@ -19,6 +18,19 @@ class Dependency {
     required this.size,
     this.version,
     this.description,
+  });
+}
+
+class FlutterDependency extends Dependency {
+  final FlutterChannel channel;
+
+  FlutterDependency({
+    required this.channel,
+    required super.name,
+    super.url,
+    required super.size,
+    super.version,
+    super.description,
   });
 }
 
@@ -159,37 +171,11 @@ class InitializationController {
       );
       return systemImageDependency;
     }).toList();
-    final flutterURLs = await getFlutterUrl(platform);
 
-    var flutterSDKSize = values
-        .where((element) => element["name"]?.contains("flutter-sdk") ?? false)
-        .toList()
-        .first;
+    final flutterDependencies = await getFlutterUrl(platform);
+
     return [
-      Dependency(
-        name: "Flutter SDK",
-        version: FlutterChannel.stable.name,
-        url: flutterURLs[FlutterChannel.stable] ?? "",
-        size: int.tryParse(
-                flutterSDKSize['size'].toString().replaceAll(" MiB", "")) ??
-            0,
-      ),
-      Dependency(
-        name: "Flutter SDK",
-        version: FlutterChannel.beta.name,
-        url: flutterURLs[FlutterChannel.beta] ?? "",
-        size: int.tryParse(
-                flutterSDKSize['size'].toString().replaceAll(" MiB", "")) ??
-            0,
-      ),
-      Dependency(
-        name: "Flutter SDK",
-        version: FlutterChannel.master.name,
-        url: flutterURLs[FlutterChannel.master] ?? "",
-        size: int.tryParse(
-                flutterSDKSize['size'].toString().replaceAll(" MiB", "")) ??
-            0,
-      ),
+      ...flutterDependencies,
       androidStudioDependency,
       cmdLineToolsDependency,
       openJDKDependency,
@@ -199,8 +185,25 @@ class InitializationController {
     ];
   }
 
-  static Future<Map<FlutterChannel, String>> getFlutterUrl(
-      String platform) async {
+  static FlutterDependency _getFlutterSDKDependency(List<dynamic> urls,
+      String hash, String platform, String baseUrl, FlutterChannel channel) {
+    final entry = urls
+        .where((element) =>
+            element["hash"] == hash &&
+            element["dart_sdk_arch"] ==
+                (platform == "macOS-silicon" ? "arm64" : "x64"))
+        .toList()
+        .first;
+    return FlutterDependency(
+        name: "Flutter SDK",
+        size: 1200,
+        description: "Flutter SDK",
+        url: "$baseUrl/${entry["archive"]}",
+        version: entry["version"],
+        channel: channel);
+  }
+
+  static Future<List<FlutterDependency>> getFlutterUrl(String platform) async {
     var flutterSDKURL =
         'https://storage.googleapis.com/flutter_infra_release/releases/releases_${Platform.isMacOS ? "macos" : Platform.isWindows ? "windows" : "linux"}.json';
     var flutterSDKURI = Uri.tryParse(flutterSDKURL);
@@ -211,40 +214,27 @@ class InitializationController {
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
       var baseURL = jsonResponse["base_url"];
+      Map<String, dynamic> currentReleases =
+          Map.from(jsonResponse["current_release"]);
+      String stableHash = currentReleases["stable"];
+      String betaHash = currentReleases["beta"];
+      String devHash = currentReleases["dev"];
       List<dynamic> urls = jsonResponse["releases"];
-      var stableURLS = urls
-          .where((element) =>
-              element["channel"] == "stable" &&
-              element["dart_sdk_arch"] ==
-                  (platform == "macOS-silicon" ? "arm64" : "x64"))
-          .toList()
-          .reduce((value, element) => (DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
-                      .parse(value["release_date"]))
-                  .isAfter(DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
-                      .parse(element["release_date"]))
-              ? value
-              : element);
-      var stableURL = "$baseURL/${stableURLS["archive"]}";
-      var betaURLS = urls
-          .where((element) =>
-              element["channel"] == "beta" &&
-              element["dart_sdk_arch"] ==
-                  (platform == "macOS-silicon" ? "arm64" : "x64"))
-          .toList()
-          .reduce((value, element) => (DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
-                      .parse(value["release_date"]))
-                  .isAfter(DateFormat("yyyy-MM-ddThh:mm:ss.SSSZ")
-                      .parse(element["release_date"]))
-              ? value
-              : element);
-      var betaURL = "$baseURL/${betaURLS["archive"]}";
-      var masterURL =
-          "https://github.com/flutter/flutter/archive/refs/heads/master.zip";
-      return {
-        FlutterChannel.stable: stableURL,
-        FlutterChannel.beta: betaURL,
-        FlutterChannel.master: masterURL,
-      };
+      var stableSDK = _getFlutterSDKDependency(
+          urls, stableHash, platform, baseURL, FlutterChannel.stable);
+      var betaSDK = _getFlutterSDKDependency(
+          urls, betaHash, platform, baseURL, FlutterChannel.beta);
+      // var devSDK = _getFlutterSDKDependency(
+      //     urls, devHash, platform, baseURL, FlutterChannel.dev);
+      var masterSDK = FlutterDependency(
+          channel: FlutterChannel.master,
+          name: "Flutter SDK",
+          size: 1200,
+          url:
+              "https://github.com/flutter/flutter/archive/refs/heads/master.zip",
+          version: "master",
+          description: "Flutter SDK");
+      return [stableSDK, betaSDK, masterSDK];
     } else {
       throw Exception("Failed to load JSON");
     }

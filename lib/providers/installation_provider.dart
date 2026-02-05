@@ -1,10 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 
-enum FlutterChannel { stable, beta, master }
+enum FlutterChannel { stable, beta, dev, master }
 
 class InstallationProvider extends ChangeNotifier {
- 
   bool deployEmulator = false;
   int emulatorAPI = 33;
   bool useVisualStudioCodeAsIDE = false;
@@ -55,7 +54,6 @@ class InstallationProvider extends ChangeNotifier {
     downloadProgress = _;
     notifyListeners();
   }
-
 
   setShouldDeployEmulator() {
     deployEmulator = !deployEmulator;
